@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/list_main_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:layout_gravity="center_vertical"
+    android:gravity="center_vertical">
+
+    <LinearLayout
+        android:id="@+id/list_main_item_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/time"
+            android:textSize="12sp"
+            android:paddingStart="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_list_time" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:paddingStart="10dp"
+            android:textSize="12sp"
+            android:layout_height="wrap_content"
+            android:text="@string/main_list_name"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/water_count_drink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="20dp"
+            android:textSize="12sp"
+            android:text="@string/main_list_water"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="@string/main_list_water_start" />
+        <ImageView
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:src="@drawable/ic_baseline_water_drop_24"
+            android:contentDescription="@string/main_list_name" />
+        <TextView
+            android:id="@+id/water_count_water"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="@string/main_list_water" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="10dp"
+            android:textSize="12sp"
+            android:text="@string/main_list_water_end"
+            tools:ignore="RtlSymmetry" />
+
+    </LinearLayout>
+</LinearLayout>
