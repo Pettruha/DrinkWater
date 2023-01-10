@@ -1,7 +1,5 @@
 package com.iarigo.water.ui.fragment_weight
 
-import android.content.Context
-import android.content.SharedPreferences
 import com.github.mikephil.charting.data.Entry
 import com.iarigo.water.storage.database.AppDatabase
 import com.iarigo.water.storage.entity.Weight
@@ -9,24 +7,19 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
-
 class WeightPresenter: WeightContract.Presenter {
 
     private lateinit var fragmentView: WeightContract.View
     private val subscriptions = CompositeDisposable()
-    private var dbHelper: AppDatabase? = null // БД
-    private lateinit var mSettings: SharedPreferences // настройки приложения
+    private var dbHelper: AppDatabase? = null
 
     override fun viewIsReady(view: WeightContract.View) {
         fragmentView = view
         dbHelper = AppDatabase.getAppDataBase(view.getFragmentContext())
-        mSettings = view.getFragmentContext().getSharedPreferences("water",
-            Context.MODE_PRIVATE
-        )
     }
 
     override fun destroy() {
-        subscriptions.dispose() // очищаем потоки
+        subscriptions.dispose()
     }
 
     override fun getWeights() {
@@ -44,7 +37,7 @@ class WeightPresenter: WeightContract.Presenter {
     }
 
     override fun getCurrentWeight() {
-        val subscribe = dbHelper?.weightDao()?.getLastWeight()?.subscribeOn(
+        val subscribe = dbHelper?.weightDao()?.getLastWeightSingle()?.subscribeOn(
             Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.subscribe ({ weight: Weight ->
@@ -58,10 +51,9 @@ class WeightPresenter: WeightContract.Presenter {
     }
 
     /**
-     * Отображаем график за весь период
+     * Graph for whole period
      */
     override fun getGraph() {
-
         val subscribe = dbHelper?.weightDao()?.getWeightsGraph()?.subscribeOn(
             Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())

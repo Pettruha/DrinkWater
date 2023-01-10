@@ -1,11 +1,12 @@
 package com.iarigo.water.ui.fragment_notify
 
+import android.app.Application
 import android.content.Context
-import android.os.Bundle
 
 interface NotifyContract {
     interface View {
         fun getFragmentContext(): Context
+        fun getApplication(): Application
         fun setPeriod(start: String, end: String)
         fun setNormaOver(over: Boolean)
         fun setFreq(string: String)
@@ -20,7 +21,6 @@ interface NotifyContract {
 
         fun saveOver(over: Boolean)
         fun saveNotifyOn(on: Boolean)
-        fun saveSound(sound: String)
         fun saveWaterPeriod(wakeUpHour: Int, wakeUpMinute: Int, goBedHour: Int, goBedMinute: Int)
     }
 }

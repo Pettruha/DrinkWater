@@ -1,42 +1,29 @@
 package com.iarigo.water.ui.fragment_notify
 
+import android.app.Application
 import android.content.Context
+import android.content.Intent
+import android.media.RingtoneManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.iarigo.water.R
-import com.iarigo.water.databinding.FragmentMainBinding
 import com.iarigo.water.databinding.FragmentNotificationsBinding
-import com.iarigo.water.ui.fragment_main.MainContract
-import com.iarigo.water.ui.fragment_main.MainPresenter
-import androidx.core.app.ActivityCompat.startActivityForResult
-
-import android.media.RingtoneManager
-
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
-import android.util.Log
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
-import com.iarigo.water.ui.dialogFirstLaunch.DialogFirstLaunch
 import com.iarigo.water.ui.dialogWaterInterval.DialogWaterInterval
 import com.iarigo.water.ui.dialogWaterPeriod.DialogWaterPeriod
-import androidx.activity.result.contract.ActivityResultContracts
-
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import com.iarigo.water.ui.main.MainActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class NotifyFragment: Fragment(), NotifyContract.View {
 
     private lateinit var presenter: NotifyContract.Presenter
-    private var binding: FragmentNotificationsBinding? = null // вместо findViewById
+    private var binding: FragmentNotificationsBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,17 +32,18 @@ class NotifyFragment: Fragment(), NotifyContract.View {
     ): View {
         presenter = NotifyPresenter()
         presenter.viewIsReady(this)
-        binding = FragmentNotificationsBinding.inflate(layoutInflater, container, false) // имя класса на основе xml layout
+        binding = FragmentNotificationsBinding.inflate(layoutInflater, container, false)
 
         return binding!!.root
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        this.parentFragmentManager.setFragmentResultListener("dialogWaterInterval", this ) { requestKey, bundle ->
+
+        this.parentFragmentManager.setFragmentResultListener("dialogWaterInterval", this ) { _, _ ->
             presenter.getFreq()
         }
-        this.parentFragmentManager.setFragmentResultListener("dialogWaterPeriod", this ) { requestKey, bundle ->
+        this.parentFragmentManager.setFragmentResultListener("dialogWaterPeriod", this ) { _, bundle ->
 
             val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
             val calendar = Calendar.getInstance()
@@ -83,16 +71,25 @@ class NotifyFragment: Fragment(), NotifyContract.View {
         return requireContext()
     }
 
+    override fun getApplication(): Application {
+        return activity?.application!!
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        settingsChange() // вешаем слежение за изменением
+        settingsChange() // click listener
     }
 
     /**
-     * Период уведомлений
+     * Notification period
      */
     override fun setPeriod(start: String, end: String) {
-        binding?.periodHours?.text = getString(R.string.notify_period_value, start, end)
+        try {
+            binding?.periodHours?.text =
+                resources.getString(R.string.notify_period_value, start, end)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun setNormaOver(over: Boolean) {
@@ -108,91 +105,63 @@ class NotifyFragment: Fragment(), NotifyContract.View {
     }
 
     /**
-     * Изменение
+     * Settings
      */
     private fun settingsChange() {
-        // уведомления сверх нормы
+        // notification if water norma per day done
         binding?.over?.setOnClickListener { _ ->
             val checked = binding?.checkboxOver?.isChecked
             presenter.saveOver(!checked!!)
             binding?.checkboxOver?.isChecked = !checked
         }
 
-        // Звук
+        // Sound or system notification
         binding?.sound?.setOnClickListener { _ ->
-            val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
-            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION)
-            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
-            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
-            intent.putExtra(
-                RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI,
-                Settings.System.DEFAULT_NOTIFICATION_URI
-            )
-
-            val existingValue: String = presenter.getSound()
-            if (existingValue.isEmpty()) {
-                // Select "Silent"
-                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, null as Uri?)
-            } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // system notification settings
+                val intentSettings: Intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().packageName)
+                startActivity(intentSettings)
+            } else { // app sound settings
+                val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION)
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
                 intent.putExtra(
-                    RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
-                    Uri.parse(existingValue)
+                    RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI,
+                    Settings.System.DEFAULT_NOTIFICATION_URI
                 )
+
+                val existingValue: String = presenter.getSound()
+                if (existingValue.isEmpty()) {
+                    // Select "Silent"
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, null as Uri?)
+                } else {
+                    intent.putExtra(
+                        RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
+                        Uri.parse(existingValue)
+                    )
+                }
+                (activity as MainActivity?)!!.soundActivityResultLauncher.launch(intent)
             }
-            MainActivity().soundActivityResultLauncher.launch(intent)
-            //startActivityForResult(intent, ringtoneWater)
         }
 
-        // Частота
+        // Notification frequency
         binding?.freq?.setOnClickListener { _ ->
             val dialog = DialogWaterInterval()
             dialog.show(parentFragmentManager, "dialogWaterInterval")
         }
 
-        // Включить
+        // turn on water notification
         binding?.notifyOn?.setOnClickListener { _ ->
             val checked = binding?.checkboxNotify?.isChecked
             presenter.saveNotifyOn(!checked!!)
             binding?.checkboxNotify?.isChecked = !checked
         }
 
-        // Период уведомлений
+        // Notification time start / time end
         binding?.period?.setOnClickListener { _ ->
             val dialog = DialogWaterPeriod()
             dialog.show(parentFragmentManager, "dialogWaterPeriod")
         }
     }
-/*
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == ringtoneWater && data != null) {
-            val ringtone: Uri? = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-            if (ringtone != null) {
-                presenter.saveSound(ringtone.toString())
-            } else {
-                // "Silent" was selected
-                presenter.saveSound("")
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-
-
-    var soundActivityResultLauncher = registerForActivityResult(
-        StartActivityForResult()
-    ) { result: ActivityResult? ->
-        if (result?.data != null) {
-            Log.d("")
-            val ringtone: Uri? = result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-            if (ringtone != null) {
-                presenter.saveSound(ringtone.toString())
-            } else {
-                // "Silent" was selected
-                presenter.saveSound("")
-            }
-        }
-    }
-
- */
 }

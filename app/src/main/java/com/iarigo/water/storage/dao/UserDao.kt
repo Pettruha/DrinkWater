@@ -7,12 +7,12 @@ import io.reactivex.Single
 
 @Dao
 interface UserDao {
-    // выбираем поль-ля
+    // user
     @Query("SELECT * FROM user WHERE _id = :id")
     fun getUser(id: Long): Single<User>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(user: User): Single<Long>
+    suspend fun insert(user: User): Long
 
     @Update
     fun update(user: User): Maybe<Int>

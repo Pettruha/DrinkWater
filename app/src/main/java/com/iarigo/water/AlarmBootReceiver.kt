@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 
 /**
- * При перезагрузке устройства, восстанавлмваем отсчет времени
+ * Phone reboot. Start notifications.
  */
 class AlarmBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

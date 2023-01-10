@@ -1,22 +1,11 @@
 package com.iarigo.water.ui.fragment_notify
 
-import android.content.Context
-import android.content.SharedPreferences
-import android.media.RingtoneManager
-import android.net.Uri
-import android.os.Bundle
-import android.provider.Settings
-import android.util.Log
 import com.iarigo.water.R
-import com.iarigo.water.base.BasePresenter
-import com.iarigo.water.helper.Helper
+import com.iarigo.water.repository.PreferencesRepository
 import com.iarigo.water.storage.database.AppDatabase
 import com.iarigo.water.storage.entity.User
-import com.iarigo.water.ui.main.MainContract
-import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,37 +14,35 @@ class NotifyPresenter: NotifyContract.Presenter {
 
     private lateinit var fragmentView: NotifyContract.View
     private val subscriptions = CompositeDisposable()
-    private var dbHelper: AppDatabase? = null // БД
-    private lateinit var mSettings: SharedPreferences // настройки приложения
+    private var dbHelper: AppDatabase? = null
+    private lateinit var preferences: PreferencesRepository
 
     override fun viewIsReady(view: NotifyContract.View) {
         fragmentView = view
         dbHelper = AppDatabase.getAppDataBase(view.getFragmentContext())
-        mSettings = view.getFragmentContext().getSharedPreferences("water",
-            Context.MODE_PRIVATE
-        )
+        preferences = PreferencesRepository(view.getApplication())
     }
 
     override fun destroy() {
-        subscriptions.dispose() // очищаем потоки
+        subscriptions.dispose()
     }
 
     override fun getParams() {
-        fragmentView.setNormaOver(mSettings.getBoolean(Helper.NOTIFY_WATER_OVER, false))
+        fragmentView.setNormaOver(preferences.getNormaOver())
         getPeriod()
         getFreq()
-        fragmentView.setNotifyOn(mSettings.getBoolean(Helper.NOTIFY_ON, true))
+        fragmentView.setNotifyOn(preferences.notify())
     }
 
     override fun getSound(): String {
-        var string = mSettings.getString(Helper.NOTIFY_SOUND, "notification_sound")
+        var string = preferences.getSound()
         if (string == null)
             string = "notification_sound"
         return string
     }
 
     private fun getPeriod() {
-        val subscribe = dbHelper?.userDao()?.getUser(mSettings.getLong(Helper.USER_ID, 1L))?.subscribeOn(Schedulers.io())
+        val subscribe = dbHelper?.userDao()?.getUser(preferences.getUserId())?.subscribeOn(Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.subscribe({ user: User ->
                 val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -78,8 +65,8 @@ class NotifyPresenter: NotifyContract.Presenter {
     }
 
     override fun getFreq() {
-        val hour = mSettings.getInt(Helper.NOTIFY_FREQ_HOUR, 1)
-        val minute = mSettings.getInt(Helper.NOTIFY_FREQ_MINUTE, 0)
+        val hour = preferences.getWaterIntervalHour()
+        val minute = preferences.getWaterIntervalMinute()
         var string = ""
         if (hour == 0) {
             string = "$minute" + fragmentView.getFragmentContext().getString(R.string.notify_freq_value_min)
@@ -92,21 +79,11 @@ class NotifyPresenter: NotifyContract.Presenter {
     }
 
     override fun saveOver(over: Boolean) {
-        val e = mSettings.edit()
-        e.putBoolean(Helper.NOTIFY_WATER_OVER, over)
-        e.apply()
+        preferences.saveNormaOver(over)
     }
 
     override fun saveNotifyOn(on: Boolean) {
-        val e = mSettings.edit()
-        e.putBoolean(Helper.NOTIFY_ON, on)
-        e.apply()
-    }
-
-    override fun saveSound(sound: String) {
-        val e = mSettings.edit()
-        e.putString(Helper.NOTIFY_SOUND, sound)
-        e.apply()
+        preferences.saveNotify(on)
     }
 
     override fun saveWaterPeriod(
@@ -115,7 +92,7 @@ class NotifyPresenter: NotifyContract.Presenter {
         goBedHour: Int,
         goBedMinute: Int
     ) {
-        val subscribe = dbHelper?.userDao()?.getUser(mSettings.getLong(Helper.USER_ID, 1L))?.subscribeOn(Schedulers.io())
+        val subscribe = dbHelper?.userDao()?.getUser(preferences.getUserId())?.subscribeOn(Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.subscribe({ user: User ->
                 user.wakeUpHour = wakeUpHour

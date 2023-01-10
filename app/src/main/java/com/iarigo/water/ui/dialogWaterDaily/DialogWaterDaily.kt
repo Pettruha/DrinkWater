@@ -1,6 +1,7 @@
 package com.iarigo.water.ui.dialogWaterDaily
 
 import android.app.AlertDialog
+import android.app.Application
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
@@ -11,13 +12,7 @@ import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
 import com.iarigo.water.R
-import com.iarigo.water.databinding.DialogWaterBinding
 import com.iarigo.water.databinding.DialogWaterDailyBinding
-import com.iarigo.water.storage.entity.Water
-import com.iarigo.water.storage.entity.Weight
-import com.iarigo.water.ui.dialogWater.WaterContract
-import com.iarigo.water.ui.dialogWater.WaterPresenter
-import java.util.*
 
 class DialogWaterDaily: DialogFragment(), WaterDailyContract.View {
     private lateinit var presenter: WaterDailyContract.Presenter
@@ -26,10 +21,12 @@ class DialogWaterDaily: DialogFragment(), WaterDailyContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //injectDependency()
         presenter = WaterDailyPresenter()
         presenter.viewIsReady(this) // view is ready to work
+    }
 
+    override fun getApplication(): Application {
+        return activity?.application!!
     }
 
     override fun getDialogContext(): Context {
@@ -53,15 +50,15 @@ class DialogWaterDaily: DialogFragment(), WaterDailyContract.View {
         return builder.create()
     }
 
-    /**
-     *  Переопределяем кнопку Сохранить
-     */
     override fun onResume() {
         super.onResume()
-        val alertDialog = dialog as AlertDialog
+
         presenter.getCurrentWater()
+
+        // Override button Save
+        val alertDialog = dialog as AlertDialog
         val positiveButton: Button = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        positiveButton.setOnClickListener { _ ->
+        positiveButton.setOnClickListener {
             saveWater()
         }
     }
@@ -72,16 +69,16 @@ class DialogWaterDaily: DialogFragment(), WaterDailyContract.View {
     }
 
     /**
-     * Закрываем диалоговое окно.
-     * Возвращаем результат в Activity
+     * Close dialog window
+     * Return result to Activity
      */
     override fun closeDialog() {
-        this.parentFragmentManager.setFragmentResult("dialogWaterDaily", bundleOf("bundleKey" to "added"))
-        dismiss() // закрываем диалог
+        this.parentFragmentManager.setFragmentResult("dialogWaterDaily", bundleOf("bundleKey" to "added"))// return to fragment
+        dismiss() // close dialog
     }
 
     /**
-     * Последнее взвешивание
+     * Last weight
      */
     override fun setCurrentWater(waterCount: String) {
         val editableString: Editable = Editable.Factory.getInstance().newEditable(waterCount)

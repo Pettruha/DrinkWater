@@ -1,29 +1,27 @@
 package com.iarigo.water.helper
 
-import android.content.SharedPreferences
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class Helper {
     companion object {
 
-        const val FIRST_VISITED = "hasVisited" // самый первый запуск
+        const val FIRST_VISITED = "hasVisited" // first app launch
         const val USER_ID = "userId"
         const val NOTIFY_WATER_OVER = "notify_water_over"
         const val NOTIFY_ON = "notify_on"
         const val NOTIFY_FREQ_MINUTE = "notify_freq_minute"
         const val NOTIFY_FREQ_HOUR = "notify_freq_hour"
         const val NOTIFY_SOUND = "notify_sound"
-        const val WATER_COUNT_PER_DAY = "water_count"
-        const val WATER_COUNT_PERSONAL = "water_count_personal"
-        const val WATER_DRINK_SELECTED = "1"
-        const val WATER_COUNT = "200"
+        const val DRINK_COUNT_PER_DAY = "water_count"
+        const val DRINK_COUNT_PERSONAL = "water_count_personal"
+        const val DRINK_SELECTED = "1"
+        const val DRINK_COUNT = "200"
         const val RATE = "rate"
 
         /**
-         * Дата из String UTC в Date
+         * Date from String UTC to Date
          * @param StrDate
          * @return
          */
@@ -45,11 +43,11 @@ class Helper {
         }
 
         /**
-         * Конвертируем строковую дату в Date
+         * Convert String date to Date
          */
         fun stringDateToMilliSeconds(date: String): Long {
-            val calendar = Calendar.getInstance() // для инициализации даты по умолчанию
-            val dateFormat = stringDateToDate(date) // дата Date в формате UTC
+            val calendar = Calendar.getInstance()
+            val dateFormat = stringDateToDate(date)
             try {
                 calendar.time = dateFormat
             } catch (e: ParseException) {

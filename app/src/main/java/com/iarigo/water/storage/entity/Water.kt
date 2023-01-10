@@ -6,9 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
- * Выпитая вода в сутки
- *
- * Дата, количество
+ * Water count per day
  */
 @Entity(indices = [Index(value = ["_id"], unique = true)])
 data class Water (

@@ -6,10 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
- * Взвешивание
- *
- * Дата
- * Вес
+ * User weights
  *
  */
 @Entity(indices = [Index(value = ["_id"], unique = true)])

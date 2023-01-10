@@ -16,14 +16,15 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/layout_current_weight">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/weight_title"
-            android:textColor="@color/water_total"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="20dp"
-            android:textSize="20sp"/>
+            android:text="@string/weight_title"
+            android:textColor="#37474F"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -43,14 +44,15 @@
             android:text="@string/weight_current"
             android:textSize="24sp"
             android:textColor="@color/water_total_text"/>
+
         <TextView
             android:id="@+id/weight_current"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/weight_current_value"
             android:layout_marginStart="20dp"
-            android:textSize="30sp"
-            android:textColor="@color/water_count"/>
+            android:text="@string/weight_current_value"
+            android:textColor="#039BE5"
+            android:textSize="30sp" />
     </LinearLayout>
 
     <LinearLayout
