@@ -1,23 +1,18 @@
 package com.iarigo.water.ui.dialogWaterInterval
 
 import android.app.AlertDialog
+import android.app.Application
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import androidx.fragment.app.DialogFragment
 import com.iarigo.water.databinding.DialogWaterIntervalBinding
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import com.iarigo.water.R
-import java.util.*
-import kotlin.collections.ArrayList
 import android.widget.TextView
 import androidx.core.os.bundleOf
-
 
 class DialogWaterInterval: DialogFragment(), WaterIntervalContract.View {
 
@@ -33,6 +28,10 @@ class DialogWaterInterval: DialogFragment(), WaterIntervalContract.View {
         //injectDependency()
         presenter = WaterIntervalPresenter()
         presenter.viewIsReady(this) // view is ready to work
+    }
+
+    override fun getApplication(): Application {
+        return activity?.application!!
     }
 
     override fun getDialogContext(): Context {
@@ -59,7 +58,7 @@ class DialogWaterInterval: DialogFragment(), WaterIntervalContract.View {
     override fun setHour(hour: Int) {
         val sReminder: Spinner = binding.intervalHour
 
-        // массив выбора
+        // array value to select
         // Create an ArrayAdapter using the string array and a default spinner layout
         val adapter = ArrayAdapter.createFromResource(
             requireContext(),
@@ -70,23 +69,23 @@ class DialogWaterInterval: DialogFragment(), WaterIntervalContract.View {
         // Apply the adapter to the spinner
         sReminder.adapter = adapter
 
-        // массив значений
+        // array values
         val mStringList = resources.getStringArray(R.array.water_interval_hours_values)
 
-        // находим позицию в массиве value
+        // find selected value in array
         var selItem = mStringList.indexOf(hour.toString())
         if (selItem == -1) {
             selItem = 0
         }
 
-        // устанавливаем выбранное значение
+        // set selected value
         sReminder.setSelection(selItem, false)
     }
 
     override fun setMinute(minute: Int) {
         val sReminder: Spinner = binding.intervalMinute
 
-        // массив выбора
+        // array value to select
         // Create an ArrayAdapter using the string array and a default spinner layout
         val adapter = ArrayAdapter.createFromResource(
             requireContext(),
@@ -97,32 +96,32 @@ class DialogWaterInterval: DialogFragment(), WaterIntervalContract.View {
         // Apply the adapter to the spinner
         sReminder.adapter = adapter
 
-        // массив значений
+        // array values
         val mStringList = resources.getStringArray(R.array.water_interval_minutes_values)
 
-        // находим позицию в массиве value
+        // find selected value in array
         var selItem = mStringList.indexOf(minute.toString())
         if (selItem == -1) {
             selItem = 0
         }
 
-        // устанавливаем выбранное значение
+        // set selected value
         sReminder.setSelection(selItem, false)
     }
 
     private fun save() {
-        // час
+        // hour
         val indexHour = binding.intervalHour.selectedItemPosition
-        // массив значений
+        // array values
         val hourList = resources.getStringArray(R.array.water_interval_hours_values)
-        // находим значение в массиве
+        // find selected value in array
         val selectedHour = hourList[indexHour].toString()
 
-        // минута
+        // minute
         val indexMinute = binding.intervalMinute.selectedItemPosition
-        // массив значений
+        // array values
         val minuteList = resources.getStringArray(R.array.water_interval_minutes_values)
-        // находим значение в массиве
+        // find selected value in array
         val selectedMinute = minuteList[indexMinute].toString()
 
         presenter.save(selectedHour, selectedMinute)
@@ -133,11 +132,11 @@ class DialogWaterInterval: DialogFragment(), WaterIntervalContract.View {
     }
 
     /**
-     * Закрываем диалоговое окно.
-     * Возвращаем результат в Activity
+     * Close dialog window
+     * Return result to Activity
      */
     override fun closeDialog() {
         this.parentFragmentManager.setFragmentResult("dialogWaterInterval", bundleOf("result" to "success"))
-        dismiss() // закрываем диалог
+        dismiss() // close dialog
     }
 }

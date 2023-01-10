@@ -20,14 +20,15 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/layout_personal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/settings_title"
-            android:textColor="@color/water_total"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="20dp"
-            android:textSize="20sp"/>
+            android:text="@string/settings_title"
+            android:textColor="#37474F"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -63,7 +64,7 @@
         app:layout_constraintBottom_toTopOf="@+id/layout_general">
 
         <LinearLayout
-            android:id="@+id/sex"
+            android:id="@+id/gender"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -74,14 +75,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
-                android:text="@string/settings_sex"
+                android:text="@string/settings_gender"
                 android:textColor="@color/settings_text"/>
             <TextView
-                android:id="@+id/sex_value"
+                android:id="@+id/gender_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
-                android:text="@string/settings_sex_value"
+                android:text="@string/settings_gender_value"
                 android:textColor="@color/settings_text_second"/>
         </LinearLayout>
         <LinearLayout
@@ -183,13 +184,14 @@
                 android:textSize="24sp"
                 android:text="@string/settings_water_personal"
                 android:textColor="@color/settings_text_disable"/>
+
             <TextView
                 android:id="@+id/water_personal_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
                 android:text="@string/settings_water_personal_text"
-                android:textColor="@color/settings_text_disable"/>
+                android:textColor="#757575"
+                android:textSize="18sp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -244,6 +246,7 @@
                 android:text="@string/settings_drink_description"
                 android:textColor="@color/settings_text_second"/>
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="5dp"
@@ -263,25 +266,7 @@
                 android:text="@string/settings_share"
                 android:textColor="@color/settings_text"/>
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:background="@color/history_background"/>
-        <LinearLayout
-            android:id="@+id/rate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginStart="20dp"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:text="@string/settings_rate"
-                android:textColor="@color/settings_text"/>
-        </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="5dp"
@@ -299,6 +284,26 @@
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
                 android:text="@string/settings_policy"
+                android:textColor="@color/settings_text"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@color/history_background"/>
+        <LinearLayout
+            android:id="@+id/rate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="20dp"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:text="@string/settings_rate"
                 android:textColor="@color/settings_text"/>
         </LinearLayout>
     </LinearLayout>

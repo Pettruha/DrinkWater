@@ -2,130 +2,131 @@
 <resources>
     <string name="app_name">Water</string>
 
-    <string name="water">Напоминание пить воду</string>
-    <string name="water_notification_text">Пора пить воду</string>
+    <string name="water">Reminder to drink water</string>
+    <string name="water_notification_text">It\'s time to drink water</string>
 
-    <string name="menu_water">Меню Приём воды</string>
-    <string name="menu_water_stat">Меню История приёма воды</string>
-    <string name="menu_weight">Меню Взвешивание</string>
-    <string name="menu_settings">Меню Настройки</string>
-    <string name="menu_notifications">Меню Уведомления</string>
+    <string name="menu_water">Menu Water intake</string>
+    <string name="menu_water_stat">Menu Water intake history</string>
+    <string name="menu_weight">Menu Weighing</string>
+    <string name="menu_settings">Menu Settings</string>
+    <string name="menu_notifications">Menu Notifications</string>
 
-    <string name="main_title">Вода</string>
+    <string name="main_title">Water</string>
     <string name="main_water_count"><b>%1$d</b>/%2$d</string>
-    <string name="main_water_description">Выбрать тип напитка</string>
-    <string name="main_water_count_now">%1$d мл</string>
-    <string name="main_water_count_now_description">Количество воды</string>
+    <string name="main_water_description">Select type of drink</string>
+    <string name="main_water_count_now">%1$d ml</string>
+    <string name="main_water_count_now_description">Amount of water</string>
     <string name="main_list_time">%1$s</string>
-    <string name="main_list_name">Напиток</string>
-    <string name="main_list_water">%1$s мл</string>
+    <string name="main_list_name">Drink</string>
+    <string name="main_list_water">%1$s ml</string>
     <string name="main_list_water_start">(</string>
     <string name="main_list_water_end">)</string>
 
-    <string name="dialog_title"><b>Заполните</b></string>
-    <string name="dialog_sex_title">Пол</string>
-    <string name="dialog_sex_women">Женский</string>
-    <string name="dialog_sex_men">Мужской</string>
-    <string name="dialog_sex_error">Укажите пол</string>
-    <string name="dialog_weight_title">Вес</string>
-    <string name="dialog_water">Количество воды в сутки: <b>%1$s</b> мл</string>
+    <string name="dialog_title"><b>Fill in</b></string>
+    <string name="dialog_gender_title">Gender</string>
+    <string name="dialog_gender_woman">Woman</string>
+    <string name="dialog_gender_man">Man</string>
+    <string name="dialog_gender_error">Please enter your gender</string>
+    <string name="dialog_weight_title">Weight</string>
+    <string name="dialog_water">Amount of water per day: <b>%1$s</b> ml</string>
     <string name="dialog_weight_count">%1$d</string>
-    <string name="dialog_weight_kg">кг</string>
-    <string name="dialog_weight_error">Вес должен быть в диапазон 30 -300 кг</string>
+    <string name="dialog_weight_kg">kg</string>
+    <string name="dialog_weight_error">Weight should be in the range of 30 – 300 kg</string>
     <string name="dialog_water_count_help">*</string>
-    <string name="dialog_water_about">рекомендуемая норма от веса</string>
-    <string name="dialog_wakeup">Время подъема</string>
+    <string name="dialog_water_about">recommended amount by weight</string>
+    <string name="dialog_wakeup">Wake up time</string>
     <string name="dialog_wakeup_time">%1$s</string>
-    <string name="dialog_wakeup_time_error">Время подъема должно быть раньше времени отбоя</string>
-    <string name="dialog_wakeup_time_error_2">Время подрствования должно быть более 3-х часов</string>
+    <string name="dialog_wakeup_time_error">Wake-up time must be earlier than the end time</string>
+    <string name="dialog_wakeup_time_error_2">Wake time should be more than 3 hours</string>
     <string name="dialog_time_wakeup_example">6:00</string>
     <string name="dialog_time_go_bed_example">22:00</string>
-    <string name="dialog_go_bed">Время отбоя</string>
-    <string name="dialog_save">Сохранить</string>
-    <string name="dialog_set_time_ok">Время установлено</string>
+    <string name="dialog_go_bed">Time to sleep</string>
+    <string name="dialog_save">Save</string>
+    <string name="dialog_set_time_ok">Time is set</string>
 
-    <string name="weight_title"><b>История веса</b></string>
-    <string name="weight_current">Текущий вес</string>
-    <string name="weight_current_value">%1$s кг</string>
-    <string name="weight_history">История</string>
-    <string name="weight_add_description">Добавить взвешивание</string>
+    <string name="weight_title"><b>History of weight</b></string>
+    <string name="weight_current">Current weight</string>
+    <string name="weight_current_value">%1$s kg</string>
+    <string name="weight_history">History</string>
+    <string name="weight_add_description">Add weighing</string>
     <string name="weight_list_date">%1$s.%2$s.%3$s</string>
 
-    <string name="water_title"><b>История и статистика</b></string>
+    <string name="water_title"><b>Statistics</b></string>
+    <string name="water_history">History. %1$s</string>
 
-    <string name="settings_title"><b>Настройки</b></string>
-    <string name="settings_personal">Личные настройки</string>
-    <string name="settings_general">Основные настройки</string>
-    <string name="settings_sex">Пол</string>
-    <string name="settings_sex_value">%1$s</string>
-    <string name="settings_weight">Вес</string>
-    <string name="settings_weight_value">%1$s кг</string>
-    <string name="settings_water">Рекомендуемое значение нормы</string>
-    <string name="settings_water_value">%1$s мл</string>
-    <string name="settings_water_personal">Суточная норма воды</string>
-    <string name="settings_water_personal_text">Нажмите, чтобы изменить</string>
-    <string name="settings_drink">Напиток по умолчанию</string>
-    <string name="settings_drink_description">Напиток, который вы очень часто пьёте</string>
-    <string name="settings_share">Поделиться с друзьями</string>
-    <string name="settings_rate">Оценить приложение</string>
-    <string name="settings_policy">Политика конфиденциальности</string>
+    <string name="settings_title"><b>Settings</b></string>
+    <string name="settings_personal">Personal settings</string>
+    <string name="settings_general">Basic settings</string>
+    <string name="settings_gender">Gender</string>
+    <string name="settings_gender_value">%1$s</string>
+    <string name="settings_weight">Weight</string>
+    <string name="settings_weight_value">%1$s kg</string>
+    <string name="settings_water">Recommended norm value</string>
+    <string name="settings_water_value">%1$s ml</string>
+    <string name="settings_water_personal">Daily water intake</string>
+    <string name="settings_water_personal_text">Click to change</string>
+    <string name="settings_drink">Default drink</string>
+    <string name="settings_drink_description">Drink that you drink very often</string>
+    <string name="settings_share">To share with friends</string>
+    <string name="settings_rate">Rate the app</string>
+    <string name="settings_policy">Privacy Policy</string>
 
-    <string name="notify_title">Уведомления</string>
-    <string name="notify_permissions">Разрешения</string>
-    <string name="notify_over">Присылать напоминания, когда норма уже выпита</string>
-    <string name="notify_notify">Настройки уведомлений</string>
-    <string name="notify_sound">Звук</string>
+    <string name="notify_title">Notifications</string>
+    <string name="notify_permissions">Permissions</string>
+    <string name="notify_over">Send reminders when the norm is already drunk</string>
+    <string name="notify_notify">Notification settings</string>
+    <string name="notify_sound">Sound</string>
     <string name="notify_sound_selected"> </string>
-    <string name="notify_period">Период уведомлений</string>
+    <string name="notify_period">Notification period</string>
     <string name="notify_period_value">%1$s - %2$s</string>
-    <string name="notify_freq">Частота</string>
+    <string name="notify_freq">Frequency</string>
     <string name="notify_freq_value">%1$s</string>
-    <string name="notify_freq_value_min">мин</string>
-    <string name="notify_freq_value_hour">час</string>
-    <string name="notify_on">Включить уведомления</string>
+    <string name="notify_freq_value_min">min</string>
+    <string name="notify_freq_value_hour">hour</string>
+    <string name="notify_on">Enable Notifications</string>
 
-    <string name="dialog_water_title"><b>Период уведомлений</b></string>
-    <string name="dialog_period_title"><b>Интервал уведомлений</b></string>
-    <string name="dialog_period_error">Интервал может быть больше 15 минут</string>
+    <string name="dialog_water_title"><b>Notification period</b></string>
+    <string name="dialog_period_title"><b>Notification interval</b></string>
+    <string name="dialog_period_error">The interval can be more than 15 minutes</string>
 
-    <string name="dialog_water_count_title">Количество выпитой воды, мл</string>
-    <string name="dialog_water_count">мл</string>
-    <string name="dialog_water_error">Укажите количество воды</string>
+    <string name="dialog_drink_count_title">The amount of liquid drunk, ml</string>
+    <string name="dialog_drink_count">ml</string>
+    <string name="dialog_drink_error">Specify the amount of water</string>
 
-    <string name="dialog_water_daily_title">Количество воды в сутки, мл</string>
-    <string name="dialog_water_daily">мл</string>
-    <string name="dialog_water_daily_error">Укажите количество воды в сутки</string>
+    <string name="dialog_water_daily_title">The amount of liquid drunk, ml</string>
+    <string name="dialog_water_daily">ml</string>
+    <string name="dialog_water_daily_error">Enter the amount of water per day</string>
 
-    <string name="dialog_drink_title">Выберите напиток</string>
+    <string name="dialog_drink_title">Choose a drink</string>
     <string name="list_drink_percent">%1$s %%</string>
     <string name="list_drink_name">%1$s</string>
-    <string name="dialog_drink_close">Закрыть</string>
-    <string name="dialog_drink_selected">Напиток выбран</string>
+    <string name="dialog_drink_close">Close</string>
+    <string name="dialog_drink_selected">Drink selected</string>
 
-    <!-- Интервал уведомлений - час -->
+    <!-- Notify interval - hour -->
     <string-array name="water_interval_hours">
-        <item>0 ч</item>
-        <item>1 ч</item>
+        <item>0 h</item>
+        <item>1 h</item>
     </string-array>
     <string-array name="water_interval_hours_values">
         <item>0</item>
         <item>1</item>
     </string-array>
 
-    <!-- Интервал уведомлений - минуты -->
+    <!-- Notify interval - minute -->
     <string-array name="water_interval_minutes">
-        <item>0 мин</item>
-        <item>5 мин</item>
-        <item>10 мин</item>
-        <item>15 мин</item>
-        <item>20 мин</item>
-        <item>25 мин</item>
-        <item>30 мин</item>
-        <item>35 мин</item>
-        <item>40 мин</item>
-        <item>45 мин</item>
-        <item>50 мин</item>
-        <item>55 мин</item>
+        <item>0 min</item>
+        <item>5 min</item>
+        <item>10 min</item>
+        <item>15 min</item>
+        <item>20 min</item>
+        <item>25 min</item>
+        <item>30 min</item>
+        <item>35 min</item>
+        <item>40 min</item>
+        <item>45 min</item>
+        <item>50 min</item>
+        <item>55 min</item>
     </string-array>
     <string-array name="water_interval_minutes_values">
         <item>0</item>
@@ -142,6 +143,38 @@
         <item>55</item>
     </string-array>
 
-    <string name="about_graph_title">График</string>
+    <string name="water_graph_legend">Water, ml</string>
+
+    <string name="about_graph_title">Schedule</string>
     <string name="about_graph_about"><b>MPAndroidChart</b> https://weeklycoding.com/mpandroidchart/</string>
+
+    <string name="dialog_policy_title">Privacy policy</string>
+    <string name="dialog_policy_text">Including…</string>
+    <string name="dialog_policy_ok">Agree</string>
+
+    <string name="water_type_1">Water</string>
+    <string name="water_type_2">Sparkling water</string>
+    <string name="water_type_3">Espresso</string>
+    <string name="water_type_4">Americano</string>
+    <string name="water_type_5">Cappuccino</string>
+    <string name="water_type_6">Latte</string>
+    <string name="water_type_7">Macchiato</string>
+    <string name="water_type_8">Latte macchiato</string>
+    <string name="water_type_9">Mocha</string>
+    <string name="water_type_10">Flat White</string>
+    <string name="water_type_11">Black tea</string>
+    <string name="water_type_12">Green tea</string>
+    <string name="water_type_13">Cola</string>
+    <string name="water_type_14">Diet cola</string>
+    <string name="water_type_15">Whole milk</string>
+    <string name="water_type_16">Skimmed milk</string>
+    <string name="water_type_17">Sports drink</string>
+    <string name="water_type_18">Juice</string>
+
+    <!-- Диалоговое окно. Нужно включить разрешения уведомлений для приложения -->
+    <string name="dialog_alarm_title">Alarms &amp; reminders</string>
+    <string name="dialog_alarm_text">For the app to work, you need to enable notifications in your phone settings.</string>
+    <string name="dialog_alarm_ok">Go to settings</string>
+    <string name="dialog_alarm_text_no_alarm">You have not enabled permission for the application. The app will not show notifications.</string>
+    <string name="dialog_ok">Ok</string>
 </resources>

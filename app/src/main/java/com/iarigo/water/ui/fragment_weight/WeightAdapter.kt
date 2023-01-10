@@ -8,9 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.iarigo.water.R
-import com.iarigo.water.storage.entity.Water
 import com.iarigo.water.storage.entity.Weight
-import com.iarigo.water.ui.fragment_water.WaterAdapter
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -22,8 +20,8 @@ class WeightAdapter (private var myDataSet: ArrayList<Weight>, private var conte
     // you provide access to all the views for a data item in a view holder
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         // each data item is just a string in this case
-        val itemTime: TextView = view.findViewById(R.id.time) // время
-        val itemWeight: TextView = view.findViewById(R.id.weight) // вес
+        val itemTime: TextView = view.findViewById(R.id.time) // time
+        val itemWeight: TextView = view.findViewById(R.id.weight) // weight
     }
 
     // Create new views (invoked by the layout manager)
@@ -33,21 +31,21 @@ class WeightAdapter (private var myDataSet: ArrayList<Weight>, private var conte
     ): ViewHolder {
         // create a new view
         val v: View = LayoutInflater.from(context)
-            .inflate(R.layout.list_weight, parent, false) // внешний вид элемента списка
+            .inflate(R.layout.list_weight, parent, false) // item view
         return ViewHolder(v as LinearLayout)
     }
 
     // Replace the contents of a view (invoked by the layout manager)
-    // Внешний вид элемента
+    // Item view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         val map = myDataSet[position]
-        setView(holder, map) // внешний вид. что показывать,что нет
+        setView(holder, map)
     }
 
     /**
-     * Определяем внешний вид элемента
+     * Item view element
      */
     private fun setView(holder: ViewHolder, map: Weight) {
         val calendar: Calendar = Calendar.getInstance()

@@ -1,6 +1,7 @@
 package com.iarigo.water.ui.dialogWaterPeriod
 
 import android.app.AlertDialog
+import android.app.Application
 import android.app.Dialog
 import android.app.TimePickerDialog
 import android.content.Context
@@ -9,14 +10,10 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.widget.TimePicker
 import android.widget.Toast
-import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import com.iarigo.water.R
-import com.iarigo.water.databinding.DialogFirstTimeBinding
 import com.iarigo.water.databinding.DialogWaterPeriodBinding
 import com.iarigo.water.storage.entity.User
-import com.iarigo.water.ui.dialogFirstLaunch.DialogContract
-import com.iarigo.water.ui.dialogFirstLaunch.DialogPresenter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,9 +25,12 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //injectDependency()
         presenter = WaterPeriodPresenter()
         presenter.viewIsReady(this) // view is ready to work
+    }
+
+    override fun getApplication(): Application {
+        return activity?.application!!
     }
 
     override fun getDialogContext(): Context {
@@ -73,7 +73,7 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
         val timeGoBed: String = formatter.format(calendar.time)
 
         binding.wakeupTime.text = getString(R.string.dialog_wakeup_time, timeWakeUp)
-        binding.wakeupTime.setOnClickListener { _ ->
+        binding.wakeupTime.setOnClickListener {
             timeSelector(
                 true,
                 user.wakeUpHour,
@@ -84,7 +84,7 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
         binding.goBedHour.text = user.bedHour.toString()
         binding.goBedMinute.text = user.bedMinute.toString()
         binding.goBedTime.text = getString(R.string.dialog_wakeup_time, timeGoBed)
-        binding.goBedTime.setOnClickListener { _ ->
+        binding.goBedTime.setOnClickListener {
             timeSelector(
                 false,
                 user.bedHour,
@@ -96,12 +96,11 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
     /**
      * showDay
      * TimePicker
-     * Сохранение результата
      */
     private fun timeSelector(wakeup: Boolean, hour: Int, minute: Int) {
-        // Показываем окно установки времени
+        // Show dialog with time set
         val mTimePicker: TimePickerDialog = TimePickerDialog(getDialogContext(),
-            { v: TimePicker?, selectedHour: Int, selectedMinute: Int ->
+            { v: TimePicker, selectedHour: Int, selectedMinute: Int ->
 
                 val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
                 val calendar = Calendar.getInstance()
@@ -110,16 +109,16 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
 
                 val time: String = formatter.format(calendar.time)
 
-                if (wakeup) {// время подъема
+                if (wakeup) {// wake up time
                     binding.wakeupTime.text = getString(R.string.dialog_wakeup_time, time)
                     binding.wakeupHour.text = selectedHour.toString()
                     binding.wakeupMinute.text = selectedMinute.toString()
-                } else {// время отбоя
+                } else {// time to bed
                     binding.goBedTime.text = getString(R.string.dialog_wakeup_time, time)
                     binding.goBedHour.text = selectedHour.toString()
                     binding.goBedMinute.text = selectedMinute.toString()
                 }
-                Toast.makeText(v?.context, R.string.dialog_set_time_ok, Toast.LENGTH_SHORT)
+                Toast.makeText(v.context, R.string.dialog_set_time_ok, Toast.LENGTH_SHORT)
                     .show()
             }, hour, minute, DateFormat.is24HourFormat(getDialogContext())
         )
@@ -132,7 +131,7 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
     }
 
     /**
-     * Сохраняем
+     * Save water period
      */
     private fun save() {
         mainUser.wakeUpHour = binding.wakeupHour.text.toString().toInt()
@@ -144,7 +143,7 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
     }
 
     /**
-     * Ошибка времени
+     * Show time error
      */
     override fun showTimeError(error: Int) {
         var errorString = R.string.dialog_wakeup_time_error.toString()
@@ -155,18 +154,11 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
     }
 
     /**
-     * Закрываем диалоговое окно.
-     * Возвращаем результат в Activity
+     * Close dialog window
+     * Return result to Activity
      */
     override fun closeDialog(bundle: Bundle) {
-        this.parentFragmentManager.setFragmentResult("dialogWaterPeriod", bundle)
-        dismiss() // закрываем диалог
-    }
-
-    /**
-     * Возврат к Activity
-     */
-    interface DialogWaterPeriodListener {
-        fun onFinishDialogWaterPeriod(bundle: Bundle)
+        this.parentFragmentManager.setFragmentResult("dialogWaterPeriod", bundle)// return to fragment
+        dismiss() // close dialog
     }
 }

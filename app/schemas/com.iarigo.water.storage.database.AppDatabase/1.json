@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2b22bbde0238d412fe90c1c1d90eab38",
+    "identityHash": "38fcfb289427baa1decc50bc2603b00b",
     "entities": [
       {
         "tableName": "User",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sex` INTEGER NOT NULL, `wake_up_hour` INTEGER NOT NULL, `wake_up_minute` INTEGER NOT NULL, `bed_hour` INTEGER NOT NULL, `bed_minute` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `gender` INTEGER NOT NULL, `wake_up_hour` INTEGER NOT NULL, `wake_up_minute` INTEGER NOT NULL, `bed_hour` INTEGER NOT NULL, `bed_minute` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -15,8 +15,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "sex",
-            "columnName": "sex",
+            "fieldPath": "gender",
+            "columnName": "gender",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -58,6 +58,7 @@
             "columnNames": [
               "_id"
             ],
+            "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_User__id` ON `${TABLE_NAME}` (`_id`)"
           }
         ],
@@ -105,6 +106,7 @@
             "columnNames": [
               "_id"
             ],
+            "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Drinks__id` ON `${TABLE_NAME}` (`_id`)"
           }
         ],
@@ -164,6 +166,7 @@
             "columnNames": [
               "_id"
             ],
+            "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Water__id` ON `${TABLE_NAME}` (`_id`)"
           }
         ],
@@ -205,6 +208,7 @@
             "columnNames": [
               "_id"
             ],
+            "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Weight__id` ON `${TABLE_NAME}` (`_id`)"
           }
         ],
@@ -214,7 +218,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b22bbde0238d412fe90c1c1d90eab38')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '38fcfb289427baa1decc50bc2603b00b')"
     ]
   }
 }

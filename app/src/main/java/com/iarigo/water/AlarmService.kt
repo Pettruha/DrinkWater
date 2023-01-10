@@ -7,8 +7,7 @@ import androidx.annotation.NonNull
 import androidx.core.app.JobIntentService
 
 /**
- *
- * Сервис автоматической установки времени срабатывания напоминаний
+ * Service Notifications
  */
 class AlarmService : JobIntentService() {
     override fun onHandleWork(@NonNull intent: Intent) {

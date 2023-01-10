@@ -1,17 +1,16 @@
 package com.iarigo.water.ui.dialogWeight
 
 import android.app.AlertDialog
+import android.app.Application
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentActivity
 import com.iarigo.water.R
 import com.iarigo.water.databinding.DialogWeightBinding
 import com.iarigo.water.storage.entity.Weight
@@ -24,10 +23,13 @@ class DialogWeight: DialogFragment(), WeightContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //injectDependency()
         presenter = WeightPresenter()
         presenter.viewIsReady(this) // view is ready to work
 
+    }
+
+    override fun getApplication(): Application {
+        return activity?.application!!
     }
 
     override fun getDialogContext(): Context {
@@ -50,15 +52,15 @@ class DialogWeight: DialogFragment(), WeightContract.View {
         return builder.create()
     }
 
-    /**
-     *  Переопределяем кнопку Сохранить
-     */
     override fun onResume() {
         super.onResume()
-        val alertDialog = dialog as AlertDialog
+
         presenter.getCurrentWeight()
+
+        // Override button Save
+        val alertDialog = dialog as AlertDialog
         val positiveButton: Button = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        positiveButton.setOnClickListener{ _ ->
+        positiveButton.setOnClickListener{
             saveWeight()
         }
     }
@@ -69,16 +71,16 @@ class DialogWeight: DialogFragment(), WeightContract.View {
     }
 
     /**
-     * Закрываем диалоговое окно.
-     * Возвращаем результат в Activity
+     * Close dialog window
+     * Return result to Activity
      */
     override fun closeDialog() {
-        this.parentFragmentManager.setFragmentResult("dialogWeight", bundleOf("bundleKey" to "added"))
-        dismiss() // закрываем диалог
+        this.parentFragmentManager.setFragmentResult("dialogWeight", bundleOf("bundleKey" to "added"))// return to fragment
+        dismiss() // close dialog
     }
 
     /**
-     * Последнее взвешивание
+     * Last weight
      */
     override fun setCurrentWeight(weight: Weight) {
         val string: String = java.lang.String.format(Locale.US, "%.02f", weight.weight)
@@ -91,8 +93,8 @@ class DialogWeight: DialogFragment(), WeightContract.View {
     }
 
     /**
-     * Ошибка веса.
-     * Вес должен быть в диапазоне 30 - 300 кг
+     * Show weight error.
+     * weight must be between 30 - 300 kg
      */
     override fun showWeightError() {
         binding.weight.error = requireContext().getString(R.string.dialog_weight_error)

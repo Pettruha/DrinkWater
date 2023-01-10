@@ -20,10 +20,10 @@ import java.util.concurrent.Executors
     version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun userDao(): UserDao // поль-ль
-    abstract fun drinksDao(): DrinksDao // напитки
-    abstract fun waterDao(): WaterDao // приём воды
-    abstract fun weightDao(): WeightDao // взвешивания
+    abstract fun userDao(): UserDao // user
+    abstract fun drinksDao(): DrinksDao // drinks
+    abstract fun waterDao(): WaterDao // water intakes
+    abstract fun weightDao(): WeightDao // user weights
 
     companion object {
         @Volatile
@@ -45,7 +45,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         /**
-         * Заполняем начальными значениями таблицу с напитками
+         * Fill table drinks.
          */
         private var dbCallback: Callback = object : Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
@@ -69,32 +69,32 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         /**
-         * Начальные данные напитков и процент воды, который в них содержится
+         * Some count of drinks.
+         * Drink name and count of water in the drink
          *
-         * Первый параметр - название
-         * Второй параметр - процент воды
-         * Третий - система (1)/поль-ля (0)
-         *
+         * First - drink name
+         * Second - percent of water in the drink
+         * Third - system (1)/user (0)
          */
         private var initCoupons = arrayOf(
-            "Вода|100|1",
-            "Газированная вода|100|1",
-            "Эспрессо|100|1",
-            "Американо|100|1",
-            "Капучино|92|1",
-            "Латте|90|1",
-            "Макаито|99|1",
-            "Латте макиато|89|1",
-            "Мокко|90|1",
-            "Флэт Уайт|93|1",
-            "Черный чай|100|1",
-            "Зеленый чай|100|1",
-            "Кола|89|1",
-            "Диетическая кола|100|1",
-            "Цельное молоко|88|1",
-            "Обезжиренное молоко|88|1",
-            "Спортивный напиток|96|1",
-            "Сок|89|1"
+            "water_type_1|100|1",
+            "water_type_2|100|1",
+            "water_type_3|100|1",
+            "water_type_4|100|1",
+            "water_type_5|92|1",
+            "water_type_6|90|1",
+            "water_type_7|99|1",
+            "water_type_8|89|1",
+            "water_type_9|90|1",
+            "water_type_10|93|1",
+            "water_type_11|100|1",
+            "water_type_12|100|1",
+            "water_type_13|89|1",
+            "water_type_14|100|1",
+            "water_type_15|88|1",
+            "water_type_16|88|1",
+            "water_type_17|96|1",
+            "water_type_18|89|1"
         )
 
         fun destroyDataBase() {

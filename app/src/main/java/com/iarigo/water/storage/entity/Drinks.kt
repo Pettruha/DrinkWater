@@ -6,15 +6,15 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
- * Таблица с напитками
- * Название - процент жидкости
+ * Table with drinks
+ * Drink name - Percent of water - System|User
  */
 @Entity(indices = [Index(value = ["_id"], unique = true)])
 data class Drinks (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     var id: Long = 0L,
-    var name: String = "",
+    var name: String = "Water",
     var percent: Int = 100,
-    var system: Boolean = false// системный/поль-ль. Поль-льский нельзя удалить/отредактировать
+    var system: Boolean = false
 ) {}
