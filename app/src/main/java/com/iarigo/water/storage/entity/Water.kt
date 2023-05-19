@@ -23,4 +23,4 @@ data class Water (
     var createAt: Long = 0L,
     @ColumnInfo(name = "day_at")
     var dayAt: Long = 0L
-) {}
+)

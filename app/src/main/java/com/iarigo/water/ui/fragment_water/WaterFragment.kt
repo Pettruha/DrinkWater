@@ -1,14 +1,13 @@
 package com.iarigo.water.ui.fragment_water
 
 import android.annotation.SuppressLint
-import android.app.Application
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,24 +24,19 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.iarigo.water.R
 import com.iarigo.water.databinding.FragmentWaterBinding
 import com.iarigo.water.storage.entity.Water
+import com.iarigo.water.ui.main.MainViewModel
 import java.util.*
 import kotlin.collections.ArrayList
 
+class WaterFragment: Fragment() {
 
-class WaterFragment: Fragment(), WaterContract.View {
-
-    private lateinit var presenter: WaterContract.Presenter
+    private val mainViewModel: MainViewModel by viewModels(ownerProducer = { requireActivity() })
     private var binding: FragmentWaterBinding? = null
     private lateinit var listAdapter: WaterAdapter
     private val aList: ArrayList<Water> = ArrayList() // List
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        presenter = WaterPresenter()
-        presenter.viewIsReady(this)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        mainViewModel.setToday()
         binding = FragmentWaterBinding.inflate(layoutInflater, container, false)
 
         init()
@@ -50,33 +44,57 @@ class WaterFragment: Fragment(), WaterContract.View {
         return binding!!.root
     }
 
-    override fun getFragmentContext(): Context {
-        return requireContext()
-    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    override fun getApplication(): Application {
-        return activity?.application!!
+        // Water Log
+        mainViewModel.waterFragmentLog.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setWaterLog(it)
+            }
+        }
+
+        // Water graph
+        mainViewModel.waterFragmentGraph.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                showGraph(it.getParcelableArrayList("values")!!, it.getStringArrayList("dateValues")!!)
+            }
+        }
+
+        // Water Day
+        mainViewModel.waterFragmentWaterDay.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setWaterDay(it)
+            }
+        }
+
+        // Show Water
+        mainViewModel.waterFragmentShowWater.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                showAddWater(it)
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        presenter.getWaters()
-        presenter.getGraph()
-        presenter.setCurrentDay()
+        mainViewModel.getWaters()
+        mainViewModel.getGraph()
+        mainViewModel.setCurrentDay()
     }
 
     private fun init() {
         registryAdapter()
         // add water click
         binding?.add?.setOnClickListener { _ ->
-            presenter.addDrink()
+            mainViewModel.addDrinkFragment()
         }
 
         // Bar chart click. Get date
         binding?.graph?.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
             override fun onValueSelected(e: Entry?, h: Highlight?) {
                 if (e != null) {
-                    presenter.setNewCurrentDay(binding?.graph?.xAxis?.valueFormatter?.getFormattedValue(e.x, binding?.graph?.xAxis).toString())
+                    mainViewModel.setNewCurrentDay(binding?.graph?.xAxis?.valueFormatter?.getFormattedValue(e.x, binding?.graph?.xAxis).toString())
                 }
             }
 
@@ -87,7 +105,7 @@ class WaterFragment: Fragment(), WaterContract.View {
     /**
      * Set history date
      */
-    override fun setWaterDay(day: String) {
+    private fun setWaterDay(day: String) {
         binding?.today?.text = requireContext().getString(R.string.water_history, day)
     }
 
@@ -123,14 +141,14 @@ class WaterFragment: Fragment(), WaterContract.View {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun setWaterLog(waterList: List<Water>) {
+    private fun setWaterLog(waterList: List<Water>) {
         aList.clear() // clear list
         aList.addAll(waterList) // add new items to list
 
         listAdapter.notifyDataSetChanged() // update list
     }
 
-    override fun showGraph(waterList: ArrayList<BarEntry>, datesList: ArrayList<String>) {
+    private fun showGraph(waterList: ArrayList<BarEntry>, datesList: ArrayList<String>) {
         val barDataSet = BarDataSet(waterList, getString(R.string.water_graph_legend))
 
         initBarChart(datesList)
@@ -196,7 +214,7 @@ class WaterFragment: Fragment(), WaterContract.View {
     /**
      * Show/Hide add water button
      */
-    override fun showAddWater(show: Boolean) {
+    private fun showAddWater(show: Boolean) {
         if (show) {
             binding?.add?.isEnabled = false
             binding?.add?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.settings_text_disable), android.graphics.PorterDuff.Mode.SRC_IN)

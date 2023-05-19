@@ -1,7 +1,5 @@
 package com.iarigo.water.ui.fragment_notify
 
-import android.app.Application
-import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
@@ -12,26 +10,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.iarigo.water.R
 import com.iarigo.water.databinding.FragmentNotificationsBinding
 import com.iarigo.water.ui.dialogWaterInterval.DialogWaterInterval
 import com.iarigo.water.ui.dialogWaterPeriod.DialogWaterPeriod
 import com.iarigo.water.ui.main.MainActivity
+import com.iarigo.water.ui.main.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NotifyFragment: Fragment(), NotifyContract.View {
+class NotifyFragment: Fragment() {
 
-    private lateinit var presenter: NotifyContract.Presenter
+    private val mainViewModel: MainViewModel by viewModels(ownerProducer = { requireActivity() })
     private var binding: FragmentNotificationsBinding? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        presenter = NotifyPresenter()
-        presenter.viewIsReady(this)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+
         binding = FragmentNotificationsBinding.inflate(layoutInflater, container, false)
 
         return binding!!.root
@@ -40,8 +35,36 @@ class NotifyFragment: Fragment(), NotifyContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Freq
+        mainViewModel.notifyFragmentFreq.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setFreq(it)
+            }
+        }
+
+        // Period
+        mainViewModel.notifyFragmentPeriod.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setPeriod(it.getString("timeWakeUp", ""), it.getString("timeGoBed", ""))
+            }
+        }
+
+        // Norma Over
+        mainViewModel.notifyFragmentNorma.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setNormaOver(it)
+            }
+        }
+
+        // Notify On
+        mainViewModel.notifyFragmentNotify.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setNotifyOn(it)
+            }
+        }
+
         this.parentFragmentManager.setFragmentResultListener("dialogWaterInterval", this ) { _, _ ->
-            presenter.getFreq()
+            mainViewModel.getFreq()
         }
         this.parentFragmentManager.setFragmentResultListener("dialogWaterPeriod", this ) { _, bundle ->
 
@@ -56,7 +79,7 @@ class NotifyFragment: Fragment(), NotifyContract.View {
             calendar.set(Calendar.MINUTE, bundle.getInt("go_bed_time_minute"))
             val timeGoBed: String = formatter.format(calendar.time)
 
-            presenter.saveWaterPeriod(bundle.getInt("wakeup_time_hour"), bundle.getInt("wakeup_time_minute"),
+            mainViewModel.saveWaterPeriod(bundle.getInt("wakeup_time_hour"), bundle.getInt("wakeup_time_minute"),
                 bundle.getInt("go_bed_time_hour"), bundle.getInt("go_bed_time_minute"))
             binding?.periodHours?.text = getString(R.string.notify_period_value, timeWakeUp, timeGoBed)
         }
@@ -64,15 +87,7 @@ class NotifyFragment: Fragment(), NotifyContract.View {
 
     override fun onResume() {
         super.onResume()
-        presenter.getParams()
-    }
-
-    override fun getFragmentContext(): Context {
-        return requireContext()
-    }
-
-    override fun getApplication(): Application {
-        return activity?.application!!
+        mainViewModel.getParams()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -83,7 +98,7 @@ class NotifyFragment: Fragment(), NotifyContract.View {
     /**
      * Notification period
      */
-    override fun setPeriod(start: String, end: String) {
+    private fun setPeriod(start: String, end: String) {
         try {
             binding?.periodHours?.text =
                 resources.getString(R.string.notify_period_value, start, end)
@@ -92,15 +107,15 @@ class NotifyFragment: Fragment(), NotifyContract.View {
         }
     }
 
-    override fun setNormaOver(over: Boolean) {
+    private fun setNormaOver(over: Boolean) {
         binding?.checkboxOver?.isChecked = over
     }
 
-    override fun setFreq(string: String) {
+    private fun setFreq(string: String) {
         binding?.freqValue?.text = getString(R.string.notify_freq_value, string)
     }
 
-    override fun setNotifyOn(on: Boolean) {
+    private fun setNotifyOn(on: Boolean) {
         binding?.checkboxNotify?.isChecked = on
     }
 
@@ -111,7 +126,7 @@ class NotifyFragment: Fragment(), NotifyContract.View {
         // notification if water norma per day done
         binding?.over?.setOnClickListener { _ ->
             val checked = binding?.checkboxOver?.isChecked
-            presenter.saveOver(!checked!!)
+            mainViewModel.saveOver(!checked!!)
             binding?.checkboxOver?.isChecked = !checked
         }
 
@@ -131,7 +146,7 @@ class NotifyFragment: Fragment(), NotifyContract.View {
                     Settings.System.DEFAULT_NOTIFICATION_URI
                 )
 
-                val existingValue: String = presenter.getSound()
+                val existingValue: String = mainViewModel.getSound()
                 if (existingValue.isEmpty()) {
                     // Select "Silent"
                     intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, null as Uri?)
@@ -154,7 +169,7 @@ class NotifyFragment: Fragment(), NotifyContract.View {
         // turn on water notification
         binding?.notifyOn?.setOnClickListener { _ ->
             val checked = binding?.checkboxNotify?.isChecked
-            presenter.saveNotifyOn(!checked!!)
+            mainViewModel.saveNotifyOn(!checked!!)
             binding?.checkboxNotify?.isChecked = !checked
         }
 

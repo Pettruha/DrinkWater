@@ -25,6 +25,7 @@
             android:id="@+id/time"
             android:textSize="12sp"
             android:paddingStart="5dp"
+            android:paddingEnd="0dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/main_list_time" />

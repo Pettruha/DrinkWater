@@ -31,6 +31,7 @@
     <string name="dialog_water">Количество воды в сутки: <b>%1$s</b> мл</string>
     <string name="dialog_weight_count">%1$d</string>
     <string name="dialog_weight_kg">кг</string>
+    <string name="dialog_weight_error_empty">Необходимо указать</string>
     <string name="dialog_weight_error">Вес должен быть в диапазон 30 – 300 кг</string>
     <string name="dialog_water_count_help">*</string>
     <string name="dialog_water_about">рекомендуемая норма от веса</string>

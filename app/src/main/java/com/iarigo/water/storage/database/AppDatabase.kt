@@ -13,6 +13,10 @@ import com.iarigo.water.storage.entity.Drinks
 import com.iarigo.water.storage.entity.User
 import com.iarigo.water.storage.entity.Water
 import com.iarigo.water.storage.entity.Weight
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 @Database(
@@ -58,14 +62,17 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         fun addDrinks(){
+            val job = SupervisorJob()
+            val scope = CoroutineScope(Dispatchers.IO + job)
             val drinksList: ArrayList<Drinks> = ArrayList()
 
             for (value in initCoupons) {
                 val ss = value.split("|").toTypedArray()
                 drinksList.add(Drinks(0L, ss[0], ss[1].toInt(), ss[2] == "1"))
             }
-
-            INSTANCE?.drinksDao()?.insertAll(drinksList)
+            scope.launch {
+                INSTANCE?.drinksDao()?.insertAll(drinksList)
+            }
         }
 
         /**

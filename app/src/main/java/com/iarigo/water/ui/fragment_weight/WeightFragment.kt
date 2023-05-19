@@ -1,7 +1,6 @@
 package com.iarigo.water.ui.fragment_weight
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,24 +24,19 @@ import com.iarigo.water.R
 import com.iarigo.water.databinding.FragmentWeightBinding
 import com.iarigo.water.storage.entity.Weight
 import com.iarigo.water.ui.dialogWeight.DialogWeight
+import com.iarigo.water.ui.main.MainViewModel
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
 
-class WeightFragment: Fragment(), WeightContract.View {
+class WeightFragment: Fragment() {
 
-    private lateinit var presenter: WeightContract.Presenter
+    private val mainViewModel: MainViewModel by viewModels(ownerProducer = { requireActivity() })
     private var binding: FragmentWeightBinding? = null
     private lateinit var listAdapter: WeightAdapter
     private val aList: ArrayList<Weight> = ArrayList() // weight list
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        presenter = WeightPresenter()
-        presenter.viewIsReady(this)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentWeightBinding.inflate(layoutInflater, container, false)
 
         init()
@@ -49,23 +44,41 @@ class WeightFragment: Fragment(), WeightContract.View {
         return binding!!.root
     }
 
-    override fun getFragmentContext(): Context {
-        return requireContext()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        presenter.getWeights()
-        presenter.getCurrentWeight()
-        presenter.getGraph()
+        mainViewModel.getWeights()
+        mainViewModel.getCurrentWeightFragment()
+        mainViewModel.getGraphFragment()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Weight Log
+        mainViewModel.weightFragmentLog.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setWeightLog(it)
+            }
+        }
+
+        // Current Weight
+        mainViewModel.weightFragmentCurrent.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setCurrentWeight(it)
+            }
+        }
+
+        // Graph
+        mainViewModel.weightFragmentGraph.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                registryGraph(it)
+            }
+        }
+
         this.parentFragmentManager.setFragmentResultListener("dialogWeight", this ) { _, _ ->
-            presenter.getWeights()
-            presenter.getCurrentWeight()
-            presenter.getGraph()
+            mainViewModel.getWeights()
+            mainViewModel.getCurrentWeightFragment()
+            mainViewModel.getGraphFragment()
         }
     }
 
@@ -111,7 +124,7 @@ class WeightFragment: Fragment(), WeightContract.View {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun setWeightLog(weightList: List<Weight>) {
+    private fun setWeightLog(weightList: List<Weight>) {
 
         aList.clear() // clear list
         aList.addAll(weightList) // add new items to list
@@ -122,7 +135,7 @@ class WeightFragment: Fragment(), WeightContract.View {
     /**
      * current weight
      */
-    override fun setCurrentWeight(weight: Weight) {
+    private fun setCurrentWeight(weight: Weight) {
         val string: String = java.lang.String.format(Locale.US, "%.02f", weight.weight)
         binding?.weightCurrent?.text = getString(R.string.weight_current_value, string)
     }
@@ -130,7 +143,7 @@ class WeightFragment: Fragment(), WeightContract.View {
     /**
      * Registry graph
      */
-    override fun registryGraph(values: ArrayList<Entry>) {
+    private fun registryGraph(values: ArrayList<Entry>) {
 
         // background color
         binding?.graph?.setBackgroundColor(Color.WHITE)
@@ -171,7 +184,7 @@ class WeightFragment: Fragment(), WeightContract.View {
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    override fun setData(values: ArrayList<Entry>) {
+    private fun setData(values: ArrayList<Entry>) {
         val set1: LineDataSet
 
         if (binding?.graph?.data != null &&

@@ -1,40 +1,50 @@
 package com.iarigo.water.ui.dialogWaterPeriod
 
 import android.app.AlertDialog
-import android.app.Application
 import android.app.Dialog
 import android.app.TimePickerDialog
-import android.content.Context
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import com.iarigo.water.R
 import com.iarigo.water.databinding.DialogWaterPeriodBinding
 import com.iarigo.water.storage.entity.User
+import com.iarigo.water.ui.main.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
-    private lateinit var presenter: WaterPeriodContract.Presenter
+class DialogWaterPeriod: DialogFragment() {
+    private val mainViewModel: MainViewModel by viewModels(ownerProducer = { requireActivity() })
     private lateinit var binding: DialogWaterPeriodBinding
     private lateinit var mainUser: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        presenter = WaterPeriodPresenter()
-        presenter.viewIsReady(this) // view is ready to work
-    }
+        // Data
+        mainViewModel.waterPeriod.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setPeriod(it)
+            }
+        }
 
-    override fun getApplication(): Application {
-        return activity?.application!!
-    }
+        // Error
+        mainViewModel.waterPeriodError.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                showTimeError(it)
+            }
+        }
 
-    override fun getDialogContext(): Context {
-        return requireContext()
+        // Close Dialog
+        mainViewModel.waterPeriodClose.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                closeDialog(it)
+            }
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -48,15 +58,12 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
                 save()
             }
 
+        mainViewModel.getWaterPeriod()
+
         return builder.create()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.destroy()
-    }
-
-    override fun setPeriod(user: User) {
+    private fun setPeriod(user: User) {
         mainUser = user
         binding.wakeupHour.text = user.wakeUpHour.toString()
         binding.wakeupMinute.text = user.wakeUpMinute.toString()
@@ -99,7 +106,7 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
      */
     private fun timeSelector(wakeup: Boolean, hour: Int, minute: Int) {
         // Show dialog with time set
-        val mTimePicker: TimePickerDialog = TimePickerDialog(getDialogContext(),
+        val mTimePicker = TimePickerDialog(requireContext(),
             { v: TimePicker, selectedHour: Int, selectedMinute: Int ->
 
                 val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -120,7 +127,7 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
                 }
                 Toast.makeText(v.context, R.string.dialog_set_time_ok, Toast.LENGTH_SHORT)
                     .show()
-            }, hour, minute, DateFormat.is24HourFormat(getDialogContext())
+            }, hour, minute, DateFormat.is24HourFormat(requireContext())
         )
         var title = R.string.dialog_wakeup
         if (!wakeup) {
@@ -139,13 +146,13 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
         mainUser.bedHour = binding.goBedHour.text.toString().toInt()
         mainUser.bedMinute = binding.goBedMinute.text.toString().toInt()
 
-        presenter.save(mainUser)
+        mainViewModel.saveWaterPeriod(mainUser)
     }
 
     /**
      * Show time error
      */
-    override fun showTimeError(error: Int) {
+    private fun showTimeError(error: Int) {
         var errorString = R.string.dialog_wakeup_time_error.toString()
         if (error == 1)
             errorString = R.string.dialog_wakeup_time_error_2.toString()
@@ -157,7 +164,7 @@ class DialogWaterPeriod: DialogFragment(), WaterPeriodContract.View {
      * Close dialog window
      * Return result to Activity
      */
-    override fun closeDialog(bundle: Bundle) {
+    private fun closeDialog(bundle: Bundle) {
         this.parentFragmentManager.setFragmentResult("dialogWaterPeriod", bundle)// return to fragment
         dismiss() // close dialog
     }

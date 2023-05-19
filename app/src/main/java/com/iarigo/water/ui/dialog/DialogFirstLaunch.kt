@@ -90,6 +90,7 @@ class DialogFirstLaunch: DialogFragment() {
 
     override fun onResume() {
         super.onResume()
+
         // Override Save button
         val alertDialog = dialog as AlertDialog
         val positiveButton: Button = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
@@ -139,7 +140,7 @@ class DialogFirstLaunch: DialogFragment() {
      */
     private fun timeSelector(wakeup: Boolean, hour: Int, minute: Int) {
         // Window time select
-        val mTimePicker: TimePickerDialog = TimePickerDialog(requireContext(),
+        val mTimePicker = TimePickerDialog(requireContext(),
             { _: TimePicker?, selectedHour: Int, selectedMinute: Int ->
                 val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
                 val calendar = Calendar.getInstance()
@@ -185,7 +186,7 @@ class DialogFirstLaunch: DialogFragment() {
      * Save
      */
     private fun saveUser() {
-        val bundle: Bundle = Bundle()
+        val bundle = Bundle()
         bundle.putBoolean("gender_woman", binding.radioGenderWoman.isChecked)
         bundle.putBoolean("gender_man", binding.radioGenderMan.isChecked)
         val weightString = binding.weight.editableText.toString()
@@ -231,7 +232,7 @@ class DialogFirstLaunch: DialogFragment() {
      * @param bundle - user parameters
      */
     private fun closeDialog(bundle: Bundle) {
-        listener?.resultLaunch(bundle);
+        listener?.resultLaunch(bundle)
         dismiss() // close dialog
     }
 

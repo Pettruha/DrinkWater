@@ -2,26 +2,27 @@ package com.iarigo.water.ui.dialogDrinkSelect
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.app.Application
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.iarigo.water.R
 import com.iarigo.water.databinding.DialogDrinkSelectBinding
+import com.iarigo.water.storage.entity.DrinksView
+import com.iarigo.water.ui.main.MainViewModel
 
-class DialogDrinkSelect: DialogFragment(), DrinkContract.View, DrinkSelectAdapter.OnItemClickListener {
-    private lateinit var presenter: DrinkContract.Presenter
+class DialogDrinkSelect: DialogFragment(), DrinkSelectAdapter.OnItemClickListener {
+    private val mainViewModel: MainViewModel by viewModels(ownerProducer = { requireActivity() })
     private lateinit var binding: DialogDrinkSelectBinding
     private lateinit var listAdapter: DrinkSelectAdapter
-    private val aList: ArrayList<HashMap<String, String>> = ArrayList() // List
+    private val aList: ArrayList<DrinksView> = ArrayList() // List
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,18 +30,22 @@ class DialogDrinkSelect: DialogFragment(), DrinkContract.View, DrinkSelectAdapte
         // Get the layout inflater
         binding = DialogDrinkSelectBinding.inflate(LayoutInflater.from(context))
 
-        presenter = DrinkPresenter()
-        presenter.viewIsReady(this) // view is ready to work
+        // Drinks
+        mainViewModel.drinkSelectList.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                updateDrinkList(it)
+            }
+        }
+
+        // Drink selected
+        mainViewModel.drinkSelected.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                if (it)
+                    drinkSelected()
+            }
+        }
 
         registryAdapter() // registry adapter
-    }
-
-    override fun getApplication(): Application {
-        return activity?.application!!
-    }
-
-    override fun getDialogContext(): Context {
-        return requireContext()
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -59,7 +64,7 @@ class DialogDrinkSelect: DialogFragment(), DrinkContract.View, DrinkSelectAdapte
     override fun onResume() {
         super.onResume()
 
-        presenter.getDrinks()
+        mainViewModel.getDrinks()
 
         // Override button Save
         val alertDialog = dialog as AlertDialog
@@ -67,11 +72,6 @@ class DialogDrinkSelect: DialogFragment(), DrinkContract.View, DrinkSelectAdapte
         positiveButton.setOnClickListener{
             closeDialog()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.destroy()
     }
 
     /**
@@ -116,7 +116,7 @@ class DialogDrinkSelect: DialogFragment(), DrinkContract.View, DrinkSelectAdapte
      * Update list
      */
     @SuppressLint("NotifyDataSetChanged")
-    override fun updateDrinkList(list: ArrayList<HashMap<String, String>>) {
+    private fun updateDrinkList(list: ArrayList<DrinksView>) {
         aList.clear()
         aList.addAll(list) // add list items
 
@@ -127,19 +127,17 @@ class DialogDrinkSelect: DialogFragment(), DrinkContract.View, DrinkSelectAdapte
      * Adapter Item click
      * Save new drink
      */
-    override fun onItemClick(item: HashMap<String, String>, position: Int) {
-        presenter.saveDrink(item["Id"].toString())
+    override fun onItemClick(item: DrinksView, position: Int) {
+        mainViewModel.saveDrink(item.drinks.id)
+        mainViewModel.getDrinks()
     }
 
     /**
      * New drink saved.
      * Show message.
      */
-    override fun drinkSelected() {
-        Toast.makeText(
-            requireContext(),
-            getString(R.string.dialog_drink_selected),
-            Toast.LENGTH_LONG
-        ).show()
+    private fun drinkSelected() {
+        Toast.makeText(requireContext(), getString(R.string.dialog_drink_selected), Toast.LENGTH_LONG)
+            .show()
     }
 }

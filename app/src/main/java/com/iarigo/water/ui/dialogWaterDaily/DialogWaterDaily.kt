@@ -1,9 +1,7 @@
 package com.iarigo.water.ui.dialogWaterDaily
 
 import android.app.AlertDialog
-import android.app.Application
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.view.LayoutInflater
@@ -11,26 +9,40 @@ import android.widget.Button
 import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import com.iarigo.water.R
 import com.iarigo.water.databinding.DialogWaterDailyBinding
+import com.iarigo.water.ui.main.MainViewModel
 
-class DialogWaterDaily: DialogFragment(), WaterDailyContract.View {
-    private lateinit var presenter: WaterDailyContract.Presenter
+class DialogWaterDaily: DialogFragment() {
+    private val mainViewModel: MainViewModel by viewModels(ownerProducer = { requireActivity() })
     private lateinit var binding: DialogWaterDailyBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        presenter = WaterDailyPresenter()
-        presenter.viewIsReady(this) // view is ready to work
-    }
+        // Water current
+        mainViewModel.waterCurrent.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setCurrentWater(it)
+            }
+        }
 
-    override fun getApplication(): Application {
-        return activity?.application!!
-    }
+        // Close Dialog
+        mainViewModel.waterClose.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                if (it)
+                    closeDialog()
+            }
+        }
 
-    override fun getDialogContext(): Context {
-        return requireContext()
+        // Show error
+        mainViewModel.waterError.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                if (it)
+                    showWaterError()
+            }
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -47,13 +59,13 @@ class DialogWaterDaily: DialogFragment(), WaterDailyContract.View {
             binding.water.error = null
         }
 
+        mainViewModel.getCurrentWater()
+
         return builder.create()
     }
 
     override fun onResume() {
         super.onResume()
-
-        presenter.getCurrentWater()
 
         // Override button Save
         val alertDialog = dialog as AlertDialog
@@ -63,16 +75,11 @@ class DialogWaterDaily: DialogFragment(), WaterDailyContract.View {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.destroy()
-    }
-
     /**
      * Close dialog window
      * Return result to Activity
      */
-    override fun closeDialog() {
+    private fun closeDialog() {
         this.parentFragmentManager.setFragmentResult("dialogWaterDaily", bundleOf("bundleKey" to "added"))// return to fragment
         dismiss() // close dialog
     }
@@ -80,16 +87,16 @@ class DialogWaterDaily: DialogFragment(), WaterDailyContract.View {
     /**
      * Last weight
      */
-    override fun setCurrentWater(waterCount: String) {
-        val editableString: Editable = Editable.Factory.getInstance().newEditable(waterCount)
+    private fun setCurrentWater(waterCount: Int) {
+        val editableString: Editable = Editable.Factory.getInstance().newEditable(waterCount.toString())
         binding.water.text = editableString
     }
 
     private fun saveWater() {
-        presenter.saveWater(binding.water.editableText.toString())
+        mainViewModel.saveWater(binding.water.editableText.toString())
     }
 
-    override fun showWaterError() {
+    private fun showWaterError() {
         binding.water.error = getString(R.string.dialog_water_daily_error)
     }
 }

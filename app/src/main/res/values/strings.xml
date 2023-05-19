@@ -31,6 +31,7 @@
     <string name="dialog_water">Amount of water per day: <b>%1$s</b> ml</string>
     <string name="dialog_weight_count">%1$d</string>
     <string name="dialog_weight_kg">kg</string>
+    <string name="dialog_weight_error_empty">Fill it</string>
     <string name="dialog_weight_error">Weight should be in the range of 30 – 300 kg</string>
     <string name="dialog_water_count_help">*</string>
     <string name="dialog_water_about">recommended amount by weight</string>

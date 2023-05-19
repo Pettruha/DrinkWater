@@ -7,7 +7,7 @@ import java.util.*
 class MyXAxisValueFormatter: IndexAxisValueFormatter() {
 
     override fun getFormattedValue(value: Float): String {
-        val timeMillis: Date = Date(value.toLong())
+        val timeMillis = Date(value.toLong())
         val dateFormat: DateFormat = DateFormat.getDateInstance(DateFormat.DATE_FIELD, Locale.getDefault())
         return dateFormat.format(timeMillis)
     }

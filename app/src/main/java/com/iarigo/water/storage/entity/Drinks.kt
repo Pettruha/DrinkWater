@@ -17,4 +17,4 @@ data class Drinks (
     var name: String = "Water",
     var percent: Int = 100,
     var system: Boolean = false
-) {}
+)

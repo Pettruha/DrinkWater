@@ -12,6 +12,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.iarigo.water.helper.DrinkPeriod
 import com.iarigo.water.repository.PreferencesRepository
 import com.iarigo.water.ui.main.MainActivity
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -21,7 +22,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
     @SuppressLint("UnspecifiedImmutableFlag")
     override fun onReceive(context: Context, intent: Intent) {
-        val preferencesRepository: PreferencesRepository = PreferencesRepository(context.applicationContext as Application)
+        val preferencesRepository = PreferencesRepository(context.applicationContext as Application)
 
         // Get Activity which will be open on notification click
         val openIntent = Intent(context.applicationContext, MainActivity::class.java)
@@ -31,7 +32,7 @@ class AlarmReceiver : BroadcastReceiver() {
             PendingIntent.getActivity(context, 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
-        val notifyID: Int = 2 // update previous notification
+        val notifyID = 2 // update previous notification
         val channel27ID: String = context.getString(R.string.water) //
         val channel27Name: String = context.getString(R.string.water_notification_text) // "Water notification";
         val channel27Description: String = context.getString(R.string.water_notification_text)
@@ -69,7 +70,7 @@ class AlarmReceiver : BroadcastReceiver() {
         } else { // application settings
             // vibration always on
             // TODO add vibration On/Off to Settings.
-            val vibrateWater: Boolean = true
+            val vibrateWater = true
 
             // sound
             val notifySound = preferencesRepository.getSound()
@@ -124,15 +125,20 @@ class AlarmReceiver : BroadcastReceiver() {
          */
         @SuppressLint("UnspecifiedImmutableFlag")
         fun setAlarm(context: Context) {
-            val preferencesRepository: PreferencesRepository = PreferencesRepository(context.applicationContext as Application)
+            val preferencesRepository = PreferencesRepository(context.applicationContext as Application)
 
             if (preferencesRepository.firstLaunch()) {// first launch done. User save information about himself
                 // get On/Off water notification
                 val notificationOnOff = preferencesRepository.notify()
 
                 if (notificationOnOff) {
-                    val waterInterval: Long =
-                        DrinkPeriod.drinkTime(context.applicationContext) // next time drink interval
+
+                    val waterInterval: Long = DrinkPeriod.drinkTime(context.applicationContext) // next time drink interval
+
+                    val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
+                    val calendar = Calendar.getInstance()
+                    calendar.timeInMillis = waterInterval
+                    val timeGoBed: String = formatter.format(calendar.time)
 
                     // AlarmManager
                     val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -196,7 +202,7 @@ class AlarmReceiver : BroadcastReceiver() {
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
             val channel27ID: String = context.getString(R.string.water)
-            val channel27Name: String = "Water notification"
+            val channel27Name = "Water notification"
             val channel27Description: String = context.getString(R.string.water_notification_text)
             val channel = NotificationChannel(
                 channel27ID,

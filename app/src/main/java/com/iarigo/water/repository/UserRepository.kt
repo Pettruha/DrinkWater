@@ -6,7 +6,6 @@ import com.iarigo.water.storage.database.AppDatabase
 import com.iarigo.water.storage.entity.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
@@ -27,5 +26,13 @@ class UserRepository(application: Application) : CoroutineScope {
         userDao?.insert(user)
     }
 
+    // user
+    suspend fun user(userId: Long) = withContext(Dispatchers.IO) {
+        userDao?.getUser(userId)
+    }
 
+    // update
+    suspend fun update(user: User) = withContext(Dispatchers.IO) {
+        userDao?.update(user)
+    }
 }

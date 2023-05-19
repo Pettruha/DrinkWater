@@ -26,4 +26,4 @@ data class User (
     var bedHour: Int = 6, // time to bed hour
     @ColumnInfo(name = "bed_minute")
     var bedMinute: Int = 6, // time to bed minute
-) {}
+)

@@ -1,36 +1,40 @@
 package com.iarigo.water.ui.dialogGender
 
 import android.app.AlertDialog
-import android.app.Application
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.Button
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import com.iarigo.water.R
 import com.iarigo.water.databinding.DialogGenderBinding
 import com.iarigo.water.storage.entity.User
+import com.iarigo.water.ui.main.MainViewModel
 
-class DialogGender: DialogFragment(), GenderContract.View {
-    private lateinit var presenter: GenderContract.Presenter
+class DialogGender: DialogFragment() {
+    private val mainViewModel: MainViewModel by viewModels(ownerProducer = { requireActivity() })
     private lateinit var binding: DialogGenderBinding
     private lateinit var currentUser: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        presenter = GenderPresenter()
-        presenter.viewIsReady(this) // view is ready to work
-    }
+        // User
+        mainViewModel.genderUser.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setGender(it)
+            }
+        }
 
-    override fun getApplication(): Application {
-        return activity?.application!!
-    }
-
-    override fun getDialogContext(): Context {
-        return requireContext()
+        // Gender selected
+        mainViewModel.genderSelected.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                if (it)
+                    closeDialog()
+            }
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -42,13 +46,13 @@ class DialogGender: DialogFragment(), GenderContract.View {
         builder.setView(binding.root)
             .setPositiveButton(R.string.dialog_save, null)
 
+        mainViewModel.getGender()
+
         return builder.create()
     }
 
     override fun onResume() {
         super.onResume()
-
-        presenter.getGender()
 
         // Override button Save
         val alertDialog = dialog as AlertDialog
@@ -58,21 +62,16 @@ class DialogGender: DialogFragment(), GenderContract.View {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.destroy()
-    }
-
     /**
      * Close dialog window
      * Return result to Activity
      */
-    override fun closeDialog() {
+    private fun closeDialog() {
         this.parentFragmentManager.setFragmentResult("dialogGender", bundleOf("bundleKey" to "added"))// return to fragment
         dismiss() // close dialog
     }
 
-    override fun setGender(user: User) {
+    private fun setGender(user: User) {
         currentUser = user
         if (user.gender == 0) {
             binding.radioGenderWoman.isChecked = true
@@ -89,6 +88,6 @@ class DialogGender: DialogFragment(), GenderContract.View {
         if (binding.radioGenderMan.isChecked)
             gender = 1
         currentUser.gender = gender
-        presenter.saveGender(currentUser)
+        mainViewModel.saveGender(currentUser)
     }
 }

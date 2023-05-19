@@ -1,9 +1,7 @@
 package com.iarigo.water.ui.dialogDrinkCount
 
 import android.app.AlertDialog
-import android.app.Application
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.view.LayoutInflater
@@ -11,35 +9,46 @@ import android.widget.Button
 import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import com.iarigo.water.R
 import com.iarigo.water.databinding.DialogDrinkBinding
+import com.iarigo.water.ui.main.MainViewModel
 
-class DialogDrinkCount: DialogFragment(), DrinkContract.View {
-    private lateinit var presenter: DrinkContract.Presenter
+class DialogDrinkCount: DialogFragment() {
+    private val mainViewModel: MainViewModel by viewModels(ownerProducer = { requireActivity() })
     private lateinit var binding: DialogDrinkBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Get the layout inflater
-        binding = DialogDrinkBinding.inflate(LayoutInflater.from(context))
+        // Drink Count
+        mainViewModel.drinkCount.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setCurrentWater(it)
+            }
+        }
 
-        presenter = DrinkPresenter()
-        presenter.viewIsReady(this) // view is ready to work
-    }
+        // WaterError
+        mainViewModel.drinkError.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                if (it)
+                    showWaterError()
+            }
+        }
 
-    override fun getDialogContext(): Context {
-        return requireContext()
-    }
-
-    override fun getApplication(): Application {
-        return activity?.application!!
+        // Close Dialog
+        mainViewModel.drinkClose.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                closeDialog(it)
+            }
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog)
         // Get the layout inflater
         binding = DialogDrinkBinding.inflate(LayoutInflater.from(context))
+
+        val builder: AlertDialog.Builder = AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog)
 
         // Add action buttons
         builder.setView(binding.root)
@@ -50,13 +59,13 @@ class DialogDrinkCount: DialogFragment(), DrinkContract.View {
             binding.drink.error = null
         }
 
+        mainViewModel.getCurrentDrinkCount()
+
         return builder.create()
     }
 
     override fun onResume() {
         super.onResume()
-
-        presenter.getCurrentDrinkCount()
 
         // Override button Save
         val alertDialog = dialog as AlertDialog
@@ -66,30 +75,25 @@ class DialogDrinkCount: DialogFragment(), DrinkContract.View {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.destroy()
-    }
-
     /**
      * Set current drink count
      * @param water - drink amount
      */
-    override fun closeDialog(water: Int) {
+    private fun closeDialog(water: Int) {
         this.parentFragmentManager.setFragmentResult("dialogDrinkCount", bundleOf("drink_count" to water))
         dismiss() // close dialog
     }
 
-    override fun showWaterError() {
+    private fun showWaterError() {
         binding.drink.error = getString(R.string.dialog_drink_error)
     }
 
-    override fun setCurrentWater(water: Int) {
-        val editableString: Editable =  Editable.Factory.getInstance().newEditable(water.toString())
+    private fun setCurrentWater(drink: Int) {
+        val editableString: Editable =  Editable.Factory.getInstance().newEditable(drink.toString())
         binding.drink.text = editableString
     }
 
     private fun saveWater() {
-        presenter.saveWater(binding.drink.editableText.toString())
+        mainViewModel.saveDrink(binding.drink.editableText.toString())
     }
 }

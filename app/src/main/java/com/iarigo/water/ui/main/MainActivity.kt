@@ -134,25 +134,25 @@ class MainActivity : AppCompatActivity(), DialogFirstLaunch.OnDialogFirstLaunchL
      */
     private fun setMenuColor(menu: Int) {
         binding.menuMain.setColorFilter(Color.argb(255, 255, 255, 255))
-        binding.menuWater.setColorFilter(Color.argb(255, 255, 255, 255));
-        binding.menuWeight.setColorFilter(Color.argb(255, 255, 255, 255));
-        binding.menuSettings.setColorFilter(Color.argb(255, 255, 255, 255));
-        binding.menuNotifications.setColorFilter(Color.argb(255, 255, 255, 255));
+        binding.menuWater.setColorFilter(Color.argb(255, 255, 255, 255))
+        binding.menuWeight.setColorFilter(Color.argb(255, 255, 255, 255))
+        binding.menuSettings.setColorFilter(Color.argb(255, 255, 255, 255))
+        binding.menuNotifications.setColorFilter(Color.argb(255, 255, 255, 255))
         when (menu) {
             1 -> {
                 binding.menuMain.setColorFilter(ContextCompat.getColor(applicationContext, R.color.water_count), android.graphics.PorterDuff.Mode.SRC_IN)
             }
             2 -> {
-                binding.menuWater.setColorFilter(ContextCompat.getColor(applicationContext, R.color.water_count), android.graphics.PorterDuff.Mode.SRC_IN);
+                binding.menuWater.setColorFilter(ContextCompat.getColor(applicationContext, R.color.water_count), android.graphics.PorterDuff.Mode.SRC_IN)
             }
             3 -> {
-                binding.menuWeight.setColorFilter(ContextCompat.getColor(applicationContext, R.color.water_count), android.graphics.PorterDuff.Mode.SRC_IN);
+                binding.menuWeight.setColorFilter(ContextCompat.getColor(applicationContext, R.color.water_count), android.graphics.PorterDuff.Mode.SRC_IN)
             }
             4 -> {
-                binding.menuSettings.setColorFilter(ContextCompat.getColor(applicationContext, R.color.water_count), android.graphics.PorterDuff.Mode.SRC_IN);
+                binding.menuSettings.setColorFilter(ContextCompat.getColor(applicationContext, R.color.water_count), android.graphics.PorterDuff.Mode.SRC_IN)
             }
             else -> {
-                binding.menuNotifications.setColorFilter(ContextCompat.getColor(applicationContext, R.color.water_count), android.graphics.PorterDuff.Mode.SRC_IN);
+                binding.menuNotifications.setColorFilter(ContextCompat.getColor(applicationContext, R.color.water_count), android.graphics.PorterDuff.Mode.SRC_IN)
             }
         }
     }
@@ -266,7 +266,7 @@ class MainActivity : AppCompatActivity(), DialogFirstLaunch.OnDialogFirstLaunchL
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult? ->
         supportFragmentManager.beginTransaction()
-            .remove(NotifyFragment()).commit();
+            .remove(NotifyFragment()).commit()
         if (result?.data != null) {
             val ringtone: Uri? = result.data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
 

@@ -1,6 +1,5 @@
 package com.iarigo.water.storage.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.iarigo.water.storage.entity.Weight
 import io.reactivex.Maybe
@@ -10,23 +9,23 @@ import io.reactivex.Single
 interface WeightDao {
     // last weight
     @Query("SELECT * FROM weight ORDER BY create_at DESC LIMIT 1")
-    fun getLastWeight(): Weight
+    suspend fun getLastWeight(): Weight
 
     // last weight
     @Query("SELECT * FROM weight ORDER BY create_at DESC LIMIT 1")
-    fun getLastWeightSingle(): Maybe<Weight>
+    suspend fun getLastWeightSingle(): Weight
 
     // last weight
     @Query("SELECT * FROM weight ORDER BY create_at DESC LIMIT 1")
-    fun getLastWeightMaybe(): Maybe<Weight>
+    suspend fun getLastWeightMaybe(): Weight
 
     // all weights
     @Query("SELECT * FROM weight ORDER BY create_at DESC")
-    fun getWeightsPeriod(): Maybe<List<Weight>>
+    suspend fun getWeightsPeriod(): List<Weight>
 
     // weights for graph
     @Query("SELECT * FROM weight ORDER BY create_at ASC")
-    fun getWeightsGraph(): Maybe<List<Weight>>
+    suspend fun getWeightsGraph(): List<Weight>
 
     // min date
     @Query("SELECT * FROM weight ORDER BY create_at ASC LIMIT 1")
@@ -40,10 +39,10 @@ interface WeightDao {
     suspend fun insertFirstTime(weight: Weight): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(weight: Weight): Single<Long>
+    suspend fun insert(weight: Weight): Long
 
     @Update
-    fun update(weight: Weight): Single<Int>
+    suspend fun update(weight: Weight): Int
 
     @Delete
     fun delete(weight: Weight)

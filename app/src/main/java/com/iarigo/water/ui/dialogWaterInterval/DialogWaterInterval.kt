@@ -1,9 +1,7 @@
 package com.iarigo.water.ui.dialogWaterInterval
 
 import android.app.AlertDialog
-import android.app.Application
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.fragment.app.DialogFragment
@@ -13,10 +11,12 @@ import android.widget.Spinner
 import com.iarigo.water.R
 import android.widget.TextView
 import androidx.core.os.bundleOf
+import androidx.fragment.app.viewModels
+import com.iarigo.water.ui.main.MainViewModel
 
-class DialogWaterInterval: DialogFragment(), WaterIntervalContract.View {
+class DialogWaterInterval: DialogFragment() {
 
-    private lateinit var presenter: WaterIntervalContract.Presenter
+    private val mainViewModel: MainViewModel by viewModels(ownerProducer = { requireActivity() })
     private lateinit var binding: DialogWaterIntervalBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,18 +24,35 @@ class DialogWaterInterval: DialogFragment(), WaterIntervalContract.View {
 
         // Get the layout inflater
         binding = DialogWaterIntervalBinding.inflate(LayoutInflater.from(context))
-        
-        //injectDependency()
-        presenter = WaterIntervalPresenter()
-        presenter.viewIsReady(this) // view is ready to work
-    }
 
-    override fun getApplication(): Application {
-        return activity?.application!!
-    }
+        // Hour
+        mainViewModel.waterIntervalHour.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setHour(it)
+            }
+        }
 
-    override fun getDialogContext(): Context {
-        return requireContext()
+        // Minute
+        mainViewModel.waterIntervalMinute.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setMinute(it)
+            }
+        }
+
+        // Error
+        mainViewModel.waterIntervalError.observe(this) {
+            it.getContentIfNotHandled()?.let {
+                showTimeError()
+            }
+        }
+
+        // Close Dialog
+        mainViewModel.waterIntervalClose.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                if (it)
+                    closeDialog()
+            }
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -47,15 +64,14 @@ class DialogWaterInterval: DialogFragment(), WaterIntervalContract.View {
                 save()
             }
 
+        mainViewModel.getIntervalHour()
+        mainViewModel.getIntervalMinute()
+
         return builder.create()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.destroy()
-    }
+    private fun setHour(hour: Int) {
 
-    override fun setHour(hour: Int) {
         val sReminder: Spinner = binding.intervalHour
 
         // array value to select
@@ -82,7 +98,8 @@ class DialogWaterInterval: DialogFragment(), WaterIntervalContract.View {
         sReminder.setSelection(selItem, false)
     }
 
-    override fun setMinute(minute: Int) {
+    private fun setMinute(minute: Int) {
+
         val sReminder: Spinner = binding.intervalMinute
 
         // array value to select
@@ -124,10 +141,10 @@ class DialogWaterInterval: DialogFragment(), WaterIntervalContract.View {
         // find selected value in array
         val selectedMinute = minuteList[indexMinute].toString()
 
-        presenter.save(selectedHour, selectedMinute)
+        mainViewModel.saveWaterInterval(selectedHour, selectedMinute)
     }
 
-    override fun showTimeError() {
+    private fun showTimeError() {
         (binding.intervalHour.selectedView as TextView).error = getString(R.string.dialog_period_error)
     }
 
@@ -135,7 +152,7 @@ class DialogWaterInterval: DialogFragment(), WaterIntervalContract.View {
      * Close dialog window
      * Return result to Activity
      */
-    override fun closeDialog() {
+    private fun closeDialog() {
         this.parentFragmentManager.setFragmentResult("dialogWaterInterval", bundleOf("result" to "success"))
         dismiss() // close dialog
     }

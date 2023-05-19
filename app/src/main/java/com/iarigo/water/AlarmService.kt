@@ -10,7 +10,7 @@ import androidx.core.app.JobIntentService
  * Service Notifications
  */
 class AlarmService : JobIntentService() {
-    override fun onHandleWork(@NonNull intent: Intent) {
+    override fun onHandleWork(intent: Intent) {
         AlarmReceiver.setAlarm(this)
     }
 

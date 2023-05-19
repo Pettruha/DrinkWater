@@ -25,4 +25,12 @@ class WaterRepository(application: Application) : CoroutineScope {
     suspend fun addWaterCount(water: Water) = withContext(Dispatchers.IO) {
         waterDao?.insert(water)
     }
+
+    suspend fun getWaterCountToday(day_begin: Long, day_end: Long) = withContext(Dispatchers.IO) {
+        waterDao?.getWaterCountToday(day_begin, day_end)
+    }
+
+    suspend fun getAllWater(day_begin: Long, day_end: Long) = withContext(Dispatchers.IO) {
+        waterDao?.getAllWater(day_begin, day_end)
+    }
 }

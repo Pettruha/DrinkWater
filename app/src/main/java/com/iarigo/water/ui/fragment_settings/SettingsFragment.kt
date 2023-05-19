@@ -1,8 +1,6 @@
 package com.iarigo.water.ui.fragment_settings
 
-import android.app.Application
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -18,27 +16,23 @@ import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.viewModels
 import com.iarigo.water.R
 import com.iarigo.water.databinding.FragmentSettingsBinding
 import com.iarigo.water.ui.dialogDrinkSelect.DialogDrinkSelect
 import com.iarigo.water.ui.dialogGender.DialogGender
 import com.iarigo.water.ui.dialogWaterDaily.DialogWaterDaily
 import com.iarigo.water.ui.dialogWeight.DialogWeight
+import com.iarigo.water.ui.main.MainViewModel
 import java.util.*
 
-class SettingsFragment: Fragment(), SettingsContract.View {
+class SettingsFragment: Fragment() {
 
-    private lateinit var presenter: SettingsContract.Presenter
+    private val mainViewModel: MainViewModel by viewModels(ownerProducer = { requireActivity() })
     private var binding: FragmentSettingsBinding? = null
     private lateinit var mShareActionProvider: ShareActionProvider
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        presenter = SettingsPresenter()
-        presenter.viewIsReady(this)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentSettingsBinding.inflate(layoutInflater, container, false)
         mShareActionProvider = ShareActionProvider(requireContext())
         init()
@@ -46,30 +40,57 @@ class SettingsFragment: Fragment(), SettingsContract.View {
         return binding!!.root
     }
 
-    override fun getFragmentContext(): Context {
-        return requireContext()
-    }
-
-    override fun getApplication(): Application {
-        return activity?.application!!
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        presenter.fillValues()
+        mainViewModel.fillValues()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Water Daily
+        mainViewModel.settingsFragmentWaterDaily.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setWaterCount(it)
+            }
+        }
+
+        // Gender
+        mainViewModel.settingsFragmentGender.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setGender(it)
+            }
+        }
+
+        // Weight
+        mainViewModel.settingsFragmentWeight.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setWeight(it)
+            }
+        }
+
+        // Water Personal
+        mainViewModel.settingsFragmentWater.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                setWaterPersonal(it)
+            }
+        }
+
+        // Rate us
+        mainViewModel.settingsFragmentHideRateUs.observe(this) {
+            it.getContentIfNotHandled()?.let {
+                hideRate()
+            }
+        }
+
         this.parentFragmentManager.setFragmentResultListener("dialogWaterDaily", this ) { _, _ ->
-            presenter.getWaterDaily()
+            mainViewModel.getWaterDaily()
         }
         this.parentFragmentManager.setFragmentResultListener("dialogGender", this ) { _, _ ->
-            presenter.getGender()
+            mainViewModel.getGenderFragment()
         }
         this.parentFragmentManager.setFragmentResultListener("dialogWeight", this ) { _, _ ->
-            presenter.getWeight()
+            mainViewModel.getWeightFragment()
         }
     }
 
@@ -132,15 +153,15 @@ class SettingsFragment: Fragment(), SettingsContract.View {
      * Checkbox count of water. Calculate from weight or personal value
      */
     private fun changeWaterArea(checked: Boolean) {
-        presenter.saveWaterCountPersonal(checked)
+        mainViewModel.saveWaterCountPersonal(checked)
         binding?.checkboxWater?.isChecked = !checked
         if (!checked) {
-            presenter.getWeight()
+            mainViewModel.getWeightFragment()
             binding?.waterCountPersonal?.isClickable = false
             binding?.waterPersonalTitle?.setTextColor(ContextCompat.getColor(requireContext(), R.color.settings_text_disable))
             binding?.waterPersonalValue?.setTextColor(ContextCompat.getColor(requireContext(), R.color.settings_text_disable))
         } else {
-            presenter.getWaterDaily()
+            mainViewModel.getWaterDaily()
             binding?.waterCountPersonal?.isClickable = true
             binding?.waterPersonalTitle?.setTextColor(ContextCompat.getColor(requireContext(), R.color.settings_text))
             binding?.waterPersonalValue?.setTextColor(ContextCompat.getColor(requireContext(), R.color.settings_text_second))
@@ -150,28 +171,28 @@ class SettingsFragment: Fragment(), SettingsContract.View {
     /**
      * Already rate
      */
-    override fun hideRate() {
+    private fun hideRate() {
         binding?.rate?.visibility = View.GONE
     }
 
-    override fun setGender(gender: Int) {
+    private fun setGender(gender: Int) {
         if (gender == 0)
             binding?.genderValue?.text = getString(R.string.dialog_gender_woman)
         else binding?.genderValue?.text = getString(R.string.dialog_gender_man)
     }
 
-    override fun setWeight(weight: Double) {
+    private fun setWeight(weight: Double) {
         binding?.weightValue?.text = getString(R.string.settings_weight_value, String.format(Locale.getDefault(), "%.02f", weight))
     }
 
-    override fun setWaterCount(waterCount: String) {
+    private fun setWaterCount(waterCount: String) {
         binding?.waterCountValue?.text = getString(R.string.settings_water_value, waterCount)
     }
 
     /**
      * Personal value of water or calculate from weight
      */
-    override fun setWaterPersonal(personal: Boolean) {
+    private fun setWaterPersonal(personal: Boolean) {
         if (!personal) {
             binding?.checkboxWater?.isChecked = true
             binding?.waterCountPersonal?.isClickable = false
@@ -209,7 +230,7 @@ class SettingsFragment: Fragment(), SettingsContract.View {
             )
         }
 
-        presenter.saveRate() // save rate
+        mainViewModel.saveRate() // save rate
     }
 
     /**

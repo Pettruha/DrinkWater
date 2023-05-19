@@ -3,7 +3,6 @@ package com.iarigo.water.repository
 import android.app.Application
 import com.iarigo.water.storage.dao.DrinksDao
 import com.iarigo.water.storage.database.AppDatabase
-import com.iarigo.water.storage.entity.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -25,7 +24,9 @@ class DrinksRepository(application: Application) : CoroutineScope {
         drinksDao!!.getDrink(drink)
     }
 
-    fun getDrinks() = drinksDao!!.getDrinks()
+    suspend fun getDrinks() = withContext(Dispatchers.IO) {
+        drinksDao!!.getDrinks()
+    }
 
     suspend fun insert() = withContext(Dispatchers.IO) {
         drinksDao!!.getDrinks()

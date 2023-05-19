@@ -9,14 +9,15 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.iarigo.water.R
+import com.iarigo.water.storage.entity.DrinksView
 import java.util.*
 import kotlin.collections.ArrayList
 
-class DrinkSelectAdapter (private var myDataSet: ArrayList<HashMap<String, String>>, private var context: Context, private val unitClickListener: OnItemClickListener) :
+class DrinkSelectAdapter (private var myDataSet: ArrayList<DrinksView>, private var context: Context, private val unitClickListener: OnItemClickListener) :
     RecyclerView.Adapter<DrinkSelectAdapter.ViewHolder>() {
 
     interface OnItemClickListener {
-        fun onItemClick(item: HashMap<String, String>, position: Int)
+        fun onItemClick(item: DrinksView, position: Int)
     }
 
     // Provide a reference to the views for each data item
@@ -56,10 +57,10 @@ class DrinkSelectAdapter (private var myDataSet: ArrayList<HashMap<String, Strin
      * Item view
      */
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun setView(holder: ViewHolder, map: HashMap<String, String>) {
-        holder.itemName.text = map["name"] // name
-        holder.itemPercent.text = context.getString(R.string.list_drink_percent, map["percent"])
-        if (map["selected"] == "1") {
+    private fun setView(holder: ViewHolder, drink: DrinksView) {
+        holder.itemName.text = drink.drinks.name // name
+        holder.itemPercent.text = context.getString(R.string.list_drink_percent, drink.drinks.percent.toString())
+        if (drink.selected) {
             holder.itemLinearLayout.background = context.getDrawable(R.color.drink_list_selected)
         }
     }

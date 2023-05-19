@@ -2,10 +2,16 @@ package com.iarigo.water.helper
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
+import androidx.room.withTransaction
 import com.iarigo.water.repository.PreferencesRepository
 import com.iarigo.water.storage.database.AppDatabase
 import com.iarigo.water.storage.entity.User
+import com.iarigo.water.storage.entity.Water
+import com.iarigo.water.storage.entity.Weight
+import kotlinx.coroutines.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Calculate time to next drink
@@ -14,11 +20,11 @@ import java.util.*
 
 class DrinkPeriod {
     companion object {
-        fun drinkTime(context: Context): Long {
-            val preferencesRepository: PreferencesRepository = PreferencesRepository(context as Application)
-            var period = 0L
 
-            val user = user(context, preferencesRepository.getUserId())
+        fun drinkTime(context: Context): Long {
+            val preferencesRepository = PreferencesRepository(context as Application)
+            var period: Long = 0L
+            val user = getUser(context, preferencesRepository.getUserId())
 
             if (!waterLimit(preferencesRepository, context)) {// notifications turn on after limit per day
 
@@ -46,6 +52,12 @@ class DrinkPeriod {
             return period
         }
 
+        private fun getUser(context: Context, userId: Long): User {
+            return runBlocking(CoroutineScope(Dispatchers.IO).coroutineContext) {
+                return@runBlocking user(context, userId)!!
+            }
+        }
+
         /**
          * Next day
          */
@@ -64,10 +76,9 @@ class DrinkPeriod {
         /**
          * User info
          */
-        private fun user(context: Context, userId: Long): User {
+        private suspend fun user(context: Context, userId: Long): User? {
             val appDatabase: AppDatabase? = AppDatabase.getAppDataBase(context)
-
-            return appDatabase?.userDao()?.getUser(userId)?.blockingGet()!!
+            return appDatabase?.withTransaction { appDatabase.userDao().getUser(userId) }
         }
 
         /**
@@ -120,8 +131,9 @@ class DrinkPeriod {
             val appDatabase: AppDatabase? = AppDatabase.getAppDataBase(context)
 
             var water = 0
-            val waters = appDatabase?.waterDao()?.getAllWater(dayBegin, dayEnd)?.blockingGet()
-            if (waters != null) {
+            val waters: List<Water> = getWaterList(context, dayBegin, dayEnd)
+
+            if (waters.isNotEmpty()) {
                 for (one in waters) {
                     water += one.countWater.toInt()
                 }
@@ -130,17 +142,36 @@ class DrinkPeriod {
             return water
         }
 
+        private fun getWaterList(context: Context, dayBegin: Long, dayEnd: Long): List<Water> {
+            return runBlocking(CoroutineScope(Dispatchers.IO).coroutineContext) {
+                return@runBlocking getWaters(context, dayBegin, dayEnd)
+            }
+        }
+
+        private suspend fun getWaters(context: Context, dayBegin: Long, dayEnd: Long) = withContext(Dispatchers.IO) {
+            val appDatabase: AppDatabase? = AppDatabase.getAppDataBase(context)
+            appDatabase?.waterDao()?.getAllWater(dayBegin, dayEnd)!!
+        }
+
         /**
          * Current weight
          */
         private fun currentWater(context: Context): Int {
-            val appDatabase: AppDatabase? = AppDatabase.getAppDataBase(context)
-            var waterCountNorma = 1800
-            val weight = appDatabase?.weightDao()?.getLastWeight()
-            if (weight != null) {
-                waterCountNorma = (weight.weight * 30).toInt()
+            return runBlocking(CoroutineScope(Dispatchers.IO).coroutineContext) {
+                var waterCountNorma = 1800
+                val weight: Weight = getWeight(context)
+
+                if (weight.id != 0L) {
+                    waterCountNorma = (weight.weight * 30).toInt()
+                }
+
+                return@runBlocking waterCountNorma
             }
-            return waterCountNorma
+        }
+
+        private suspend fun getWeight(context: Context) = withContext(Dispatchers.IO) {
+            val appDatabase: AppDatabase? = AppDatabase.getAppDataBase(context)
+            appDatabase?.weightDao()?.getLastWeight()!!
         }
 
         /**

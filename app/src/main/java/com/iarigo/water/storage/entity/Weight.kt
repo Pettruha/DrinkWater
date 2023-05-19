@@ -17,4 +17,4 @@ data class Weight (
     var weight: Double = 0.0,
     @ColumnInfo(name = "create_at")
     var createAt: Long = 0L
-) {}
+)
