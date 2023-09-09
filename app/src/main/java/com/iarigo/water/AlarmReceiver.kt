@@ -1,12 +1,15 @@
 package com.iarigo.water
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.*
+import android.content.pm.PackageManager
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.iarigo.water.helper.DrinkPeriod
@@ -105,6 +108,20 @@ class AlarmReceiver : BroadcastReceiver() {
             }
         }
         val notificationManager = NotificationManagerCompat.from(context.applicationContext)
+        if (ActivityCompat.checkSelfPermission(
+                context.applicationContext,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
         notificationManager.notify(notifyID, builder.build())
 
         // water notification next time
@@ -123,7 +140,7 @@ class AlarmReceiver : BroadcastReceiver() {
          * Set time notification
          * @param context
          */
-        @SuppressLint("UnspecifiedImmutableFlag")
+        @SuppressLint("UnspecifiedImmutableFlag", "ScheduleExactAlarm")
         fun setAlarm(context: Context) {
             val preferencesRepository = PreferencesRepository(context.applicationContext as Application)
 

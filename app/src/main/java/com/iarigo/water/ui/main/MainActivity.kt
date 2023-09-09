@@ -11,6 +11,7 @@ import android.provider.Settings
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -53,6 +54,8 @@ class MainActivity : AppCompatActivity(), DialogFirstLaunch.OnDialogFirstLaunchL
             }
         }
 
+        onBackPressedDispatcher.addCallback(this,onBackPressedCallback) // BackPress button
+
         setContentView(binding.root)
         menuButton()
         startAlarm(0) // check enable notification API 31
@@ -64,13 +67,16 @@ class MainActivity : AppCompatActivity(), DialogFirstLaunch.OnDialogFirstLaunchL
         showFirstView() // First view
     }
 
-    override fun onBackPressed() {
-        val count = supportFragmentManager.backStackEntryCount
-        if (count == 0) {
-            super.onBackPressed()
-            //additional code
-        } else {
-            supportFragmentManager.popBackStack()
+    /**
+     * BackPress button
+     */
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            val count = supportFragmentManager.backStackEntryCount
+            if (count > 1) {
+                supportFragmentManager.popBackStackImmediate()
+                checkCurrentFragment()
+            }
         }
     }
 
@@ -91,7 +97,26 @@ class MainActivity : AppCompatActivity(), DialogFirstLaunch.OnDialogFirstLaunchL
     private fun showFirstView() {
         val fragment = MainFragment()
         setMenuColor(1)
-        supportFragmentManager.beginTransaction().replace(R.id.content, fragment).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.content, fragment, "1").addToBackStack(null).commit()
+    }
+
+    /**
+     * Check current fragment
+     */
+    private fun checkCurrentFragment() {
+        val f = supportFragmentManager.fragments[0]
+        try {
+            if ((f != null) && f.isVisible) {
+                when(val number = f.tag!!.toInt()) {
+                    in 1..5 -> {
+                        setMenuColor(number)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
 
     /**
@@ -101,31 +126,31 @@ class MainActivity : AppCompatActivity(), DialogFirstLaunch.OnDialogFirstLaunchL
         // Main screen
         binding.menuMain.setOnClickListener {
             setMenuColor(1)
-            supportFragmentManager.beginTransaction().replace(R.id.content, MainFragment()).commit()
+            supportFragmentManager.beginTransaction().replace(R.id.content, MainFragment(), "1").addToBackStack(null).commit()
         }
 
         // Water statistic
         binding.menuWater.setOnClickListener {
             setMenuColor(2)
-            supportFragmentManager.beginTransaction().replace(R.id.content, WaterFragment()).commit()
+            supportFragmentManager.beginTransaction().replace(R.id.content, WaterFragment(), "2").addToBackStack(null).commit()
         }
 
         // Weight statistic
         binding.menuWeight.setOnClickListener {
             setMenuColor(3)
-            supportFragmentManager.beginTransaction().replace(R.id.content, WeightFragment()).commit()
+            supportFragmentManager.beginTransaction().replace(R.id.content, WeightFragment(), "3").addToBackStack(null).commit()
         }
 
         // Settings
         binding.menuSettings.setOnClickListener {
             setMenuColor(4)
-            supportFragmentManager.beginTransaction().replace(R.id.content, SettingsFragment()).commit()
+            supportFragmentManager.beginTransaction().replace(R.id.content, SettingsFragment(), "4").addToBackStack(null).commit()
         }
 
         // Notifications
         binding.menuNotifications.setOnClickListener {
             setMenuColor(5)
-            supportFragmentManager.beginTransaction().replace(R.id.content, NotifyFragment()).commit()
+            supportFragmentManager.beginTransaction().replace(R.id.content, NotifyFragment(), "5").addToBackStack(null).commit()
         }
     }
 
