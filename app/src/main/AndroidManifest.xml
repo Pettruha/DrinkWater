@@ -16,13 +16,24 @@
         android:enableOnBackInvokedCallback="true"
         android:theme="@style/Theme.Water"
         tools:targetApi="tiramisu">
+
+        <!-- SplashScreen -->
+        <activity
+            android:name="SplashScreen"
+            android:theme="@style/Theme.App.Starting"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
 
