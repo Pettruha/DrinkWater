@@ -178,4 +178,10 @@
     <string name="dialog_alarm_ok">Настроить</string>
     <string name="dialog_alarm_text_no_alarm">Вы не включили разрешение для приложения. Приложение не будет показывать уведомления.</string>
     <string name="dialog_ok">Ok</string>
+
+    <!-- Диалоговое окно. Нужно включить разрешения уведомлений для приложения. -->
+    <string name="dialog_notifications_title">Настройка уведомлений</string>
+    <string name="dialog_notifications_text">Для работы приложения необходимо включить уведомления в настройках Вашего телефона.</string>
+    <string name="dialog_notifications_ok">Настроить</string>
+    <string name="dialog_notifications_cancel">Настроить позже</string>
 </resources>

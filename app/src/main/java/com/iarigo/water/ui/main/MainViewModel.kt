@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Bundle
 import android.text.Editable
-import android.util.Log
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.github.mikephil.charting.data.BarEntry

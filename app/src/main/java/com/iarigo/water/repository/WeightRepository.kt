@@ -10,7 +10,6 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
 class WeightRepository(application: Application) : CoroutineScope {
-    // TODO снести?
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 

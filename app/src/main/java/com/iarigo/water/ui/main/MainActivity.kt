@@ -1,7 +1,9 @@
 package com.iarigo.water.ui.main
 
+import android.Manifest
 import android.app.AlarmManager
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.media.RingtoneManager
 import android.net.Uri
@@ -11,9 +13,11 @@ import android.provider.Settings
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -209,66 +213,192 @@ class MainActivity : AppCompatActivity(), DialogFirstLaunch.OnDialogFirstLaunchL
      *                  1- second launch. Show info about notification working
      */
     private fun startAlarm(showCount: Int) {
-        var start = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // API > 31
-            val alarmManager = ContextCompat.getSystemService(
-                this,
-                AlarmManager::class.java
-            )!!
-            if (!alarmManager.canScheduleExactAlarms()) { // notification disable
-                start = false
-                when (showCount) {
-                    0 -> {
-                        // dialog. need turn on notification
-                        val builder = AlertDialog.Builder(this@MainActivity)
-                        builder.setTitle(R.string.dialog_alarm_title)
-
-                        // dialog text
-                        val dialogLayout = LinearLayout(this@MainActivity)
-                        dialogLayout.orientation = LinearLayout.VERTICAL
-                        val text = TextView(this@MainActivity)
-                        text.setText(R.string.dialog_alarm_text)
-                        text.setPadding(10, 10, 10, 10)
-                        text.gravity = Gravity.CENTER
-                        text.textSize = 15f
-                        dialogLayout.addView(text)
-                        builder.setView(dialogLayout)
-                        builder.setPositiveButton(R.string.dialog_alarm_ok) { _, _ ->
-                            // open system settings
-                            val intent =
-                                Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                            androidSettingsAlarmAndReminderLauncher.launch(intent)
-                        }
-                        builder.show()
-                    }
-                    1 -> {
-                        val builder2 = AlertDialog.Builder(this@MainActivity)
-                        builder2.setTitle(R.string.dialog_alarm_title)
-
-                        // dialog text
-                        val dialogLayout2 = LinearLayout(this@MainActivity)
-                        dialogLayout2.orientation = LinearLayout.VERTICAL
-                        val text2 = TextView(this@MainActivity)
-                        text2.setText(R.string.dialog_alarm_text_no_alarm)
-                        text2.setPadding(10, 10, 10, 10)
-                        text2.gravity = Gravity.CENTER
-                        text2.textSize = 15f
-                        dialogLayout2.addView(text2)
-                        builder2.setView(dialogLayout2)
-                        builder2.setPositiveButton(R.string.dialog_ok, null)
-                        builder2.show()
-                    }
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {// Notifications permission not granted
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    getNotificationPermission()
+                } else {
+                    notifications(showCount)
                 }
             }
         }
 
-        if (start) {
-            val t: Thread = object : Thread() {
-                override fun run() {
-                    AlarmReceiver.setAlarm(applicationContext) // run alarm receiver
+        startAlarmReceiver()
+    }
+
+    /**
+     * Start Alarm Receiver
+     */
+    private fun startAlarmReceiver() {
+        val t: Thread = object : Thread() {
+            override fun run() {
+                AlarmReceiver.setAlarm(applicationContext) // run alarm receiver
+            }
+        }
+        t.start()
+    }
+
+    /**
+     * Notifications API 31
+     * @param showCount - witch dialog show
+     *                  0 - first launch. Show settings dialog
+     *                  1- second launch. Show info about notification working
+     */
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun notifications(showCount: Int) {
+        when (showCount) {
+            0 -> {
+                // Dialog
+                val builder = AlertDialog.Builder(this@MainActivity)
+                builder.setTitle(R.string.dialog_notifications_title)
+
+                val dialogLayout = LinearLayout(this@MainActivity)
+                dialogLayout.orientation = LinearLayout.VERTICAL
+                val text = TextView(this@MainActivity)
+                text.setText(R.string.dialog_notifications_text)
+                text.setPadding(10, 10, 10, 10)
+                text.gravity = Gravity.CENTER
+                text.textSize = 15f
+                dialogLayout.addView(text)
+                builder.setView(dialogLayout)
+                builder.setPositiveButton(R.string.dialog_notifications_ok) { _, _ ->
+                    // open system settings
+                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    intent.putExtra(
+                        Settings.EXTRA_APP_PACKAGE,
+                        packageName
+                    )
+                    androidSettingsNotificationsLauncher.launch(intent)
+                }
+                builder.setNegativeButton(R.string.dialog_notifications_cancel) { _, _ ->
+                    // message about notifications
+                    Toast.makeText(
+                        applicationContext,
+                        R.string.dialog_alarm_text_no_alarm,
+                        Toast.LENGTH_LONG
+                    ).show()
+                    checkBackgroundWork(0) // Check background work
+                }
+                builder.setCancelable(false)
+                builder.show()
+            }
+
+            1 -> {
+                Toast.makeText(
+                    applicationContext,
+                    R.string.dialog_alarm_text_no_alarm,
+                    Toast.LENGTH_LONG
+                ).show()
+                checkBackgroundWork(0) // Check background work
+            }
+        }
+    }
+
+    /**
+     * Notifications result require permission
+     */
+    @RequiresApi(Build.VERSION_CODES.S)
+    private var androidSettingsNotificationsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { _: ActivityResult? ->
+        // Check grant
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notifications(1)
+        }
+    }
+
+    /**
+     * Background work API 31
+     * @param showCount - witch dialog show
+     *                  0 - first launch. Show settings dialog
+     *                  1- second launch. Show info about notification working
+     */
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun checkBackgroundWork(showCount: Int) {
+        val alarmManager = ContextCompat.getSystemService(
+            this,
+            AlarmManager::class.java
+        )!!
+        if (!alarmManager.canScheduleExactAlarms()) { // notification disable
+            when (showCount) {
+                0 -> {
+                    // dialog. need turn on notification
+                    val builder = AlertDialog.Builder(this@MainActivity)
+                    builder.setTitle(R.string.dialog_alarm_title)
+
+                    // dialog text
+                    val dialogLayout = LinearLayout(this@MainActivity)
+                    dialogLayout.orientation = LinearLayout.VERTICAL
+                    val text = TextView(this@MainActivity)
+                    text.setText(R.string.dialog_alarm_text)
+                    text.setPadding(10, 10, 10, 10)
+                    text.gravity = Gravity.CENTER
+                    text.textSize = 15f
+                    dialogLayout.addView(text)
+                    builder.setView(dialogLayout)
+                    builder.setPositiveButton(R.string.dialog_alarm_ok) { _, _ ->
+                        // open system settings
+                        val intent =
+                            Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                        androidSettingsAlarmAndReminderLauncher.launch(intent)
+                    }
+                    builder.show()
+                }
+
+                1 -> {
+                    val builder2 = AlertDialog.Builder(this@MainActivity)
+                    builder2.setTitle(R.string.dialog_alarm_title)
+
+                    // dialog text
+                    val dialogLayout2 = LinearLayout(this@MainActivity)
+                    dialogLayout2.orientation = LinearLayout.VERTICAL
+                    val text2 = TextView(this@MainActivity)
+                    text2.setText(R.string.dialog_alarm_text_no_alarm)
+                    text2.setPadding(10, 10, 10, 10)
+                    text2.gravity = Gravity.CENTER
+                    text2.textSize = 15f
+                    dialogLayout2.addView(text2)
+                    builder2.setView(dialogLayout2)
+                    builder2.setPositiveButton(R.string.dialog_ok, null)
+                    builder2.show()
                 }
             }
-            t.start()
+        }
+    }
+
+    /**
+     * Notifications permission API > 32
+     */
+    private fun getNotificationPermission() {
+        try {
+            if (Build.VERSION.SDK_INT > 32) {
+                requestNotificationsPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * Result Notifications permission
+     */
+    private val requestNotificationsPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { result: Boolean ->
+        if (result) {
+            // PERMISSION GRANTED
+            startAlarmReceiver()
+        } else {
+            // PERMISSION NOT GRANTED
+            Toast.makeText(
+                applicationContext,
+                R.string.dialog_alarm_text_no_alarm,
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 

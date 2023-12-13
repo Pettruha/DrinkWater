@@ -172,10 +172,16 @@
     <string name="water_type_17">Sports drink</string>
     <string name="water_type_18">Juice</string>
 
-    <!-- Диалоговое окно. Нужно включить разрешения уведомлений для приложения -->
+    <!-- Диалоговое окно. Нужно включить работу в фоне -->
     <string name="dialog_alarm_title">Alarms &amp; reminders</string>
     <string name="dialog_alarm_text">For the app to work, you need to enable notifications in your phone settings.</string>
     <string name="dialog_alarm_ok">Go to settings</string>
     <string name="dialog_alarm_text_no_alarm">You have not enabled permission for the application. The app will not show notifications.</string>
     <string name="dialog_ok">Ok</string>
+
+    <!-- Диалоговое окно. Нужно включить разрешения уведомлений для приложения -->
+    <string name="dialog_notifications_title">Setting up notifications</string>
+    <string name="dialog_notifications_text">For the application to work, you must enable notifications in your phone settings.</string>
+    <string name="dialog_notifications_ok">Go to settings</string>
+    <string name="dialog_notifications_cancel">Set up later</string>
 </resources>
